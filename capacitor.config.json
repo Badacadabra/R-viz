@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "R-viz",
+	"webDir": "dist",
+	"bundledWebRuntime": false
+}
