@@ -1,0 +1,20 @@
+ion-text h2, ion-label h2 {
+  font-size: large;
+  padding: 5px 10px;
+  margin-top: 10px;
+  font-variant: small-caps;
+  clip-path: polygon(0% 0%,100% 0%,90% 100%,0% 100%);
+  background-color: var(--ion-color-secondary);
+  color: white;
+  width: 85%;
+}
+
+.main-modal::part(content) {
+  --width: 100%;
+  --height: 100%;
+  --border-radius: 0;
+}
+
+.main-modal ion-content {
+  height: 90%;
+}
