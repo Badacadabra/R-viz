@@ -1,0 +1,17 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "R-viz",
+	"webDir": "dist",
+	"bundledWebRuntime": false,
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 3000,
+			"launchAutoHide": true,
+			"backgroundColor": "#245aa6",
+			"androidSplashResourceName": "splash",
+			"showSpinner": false,
+			"layoutName": "launch_screen",
+			"useDialog": true
+		}
+	}
+}
