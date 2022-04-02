@@ -9,12 +9,18 @@ ion-text h2, ion-label h2 {
   width: 85%;
 }
 
-.main-modal::part(content) {
-  --width: 100%;
-  --height: 100%;
-  --border-radius: 0;
+ion-icon {
+  pointer-events: none;
 }
 
 .main-modal ion-content {
   height: 90%;
+}
+
+@media (max-width: 992px) {
+  .main-modal::part(content) {
+    --width: 100%;
+    --height: 100%;
+    --border-radius: 0;
+  }
 }

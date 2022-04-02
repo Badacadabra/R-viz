@@ -36,7 +36,7 @@
         </ion-card-header>
         <ion-card-content>
           <ion-item lines="none">
-            <ion-label class="ion-text-wrap">{{ period }}</ion-label>
+            <ion-label id="period" class="ion-text-wrap">{{ period }}</ion-label>
           </ion-item>
         </ion-card-content>
       </ion-card>
@@ -253,6 +253,10 @@ export default defineComponent({
   width: 30%;
   margin: auto;
   display: block;
+}
+
+#period {
+  text-align: center;
 }
 
 #suggestions {

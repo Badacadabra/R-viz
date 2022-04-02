@@ -1,9 +1,10 @@
 <template>
-  <div id="map" ref="map"></div>
+  <div id="forecasts-map" ref="forecastsMap"></div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { getPlatforms } from '@ionic/vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as Vector from 'esri-leaflet-vector';
@@ -39,13 +40,26 @@ export default defineComponent({
   },
   methods: {
     setupLeafletMap(): void {
+      // Handle different platforms
+      let zoomControl = false,
+          zoomLevel = 7;
+
+      if (getPlatforms().includes('tablet') && window.innerWidth >= 700) {
+        zoomLevel = 8;
+      }
+
+      if (getPlatforms().includes('desktop') && window.innerWidth >= 1500) {
+        zoomControl = true;
+        zoomLevel = 8;
+      }
+
       // Init map
-      this.map = L.map('map', {
-        zoomControl: false,
-        minZoom: 7,
+      this.map = L.map('forecasts-map', {
+        zoomControl,
+        minZoom: zoomLevel,
         maxZoom: 17,
         attributionControl: false
-      }).setView(this.center, 7);
+      }).setView(this.center, zoomLevel);
 
       // Fix problem with tile loading
       this.map.whenReady(() => {
@@ -72,7 +86,7 @@ export default defineComponent({
 
       // Map controls
       const ctrl = L.control as any,
-            menu = ctrl({ position: 'topleft' });
+            menu = ctrl({ position: 'topright' });
 
       menu.onAdd = () => {
         let div = L.DomUtil.create('div', 'menu');
@@ -89,7 +103,7 @@ export default defineComponent({
       menu.addTo(this.map);
 
       // Event listeners
-      const buttons = this.$refs.map.querySelectorAll('.pollutantSelector');
+      const buttons = this.$refs.forecastsMap.querySelectorAll('.pollutantSelector');
 
       for (let button of buttons) {
         button.addEventListener('click', (e) => {
@@ -130,32 +144,32 @@ export default defineComponent({
 </script>
 
 <style>
-#map {
+#forecasts-map {
  width: 100%;
- height: 80%;
+ height: 90%;
 }
 
-.menu, .pollutantSelector {
+#forecasts-map .menu, #forecasts-map .pollutantSelector {
   background-color: white;
   border-radius: 20px;
 }
 
-.pollutantSelector {
+#forecasts-map .pollutantSelector {
   padding: 10px;
 }
 
-.active {
+#forecasts-map .active {
   color: white;
   background-color: var(--ion-color-secondary) !important;
 }
 
-.leaflet-top.leaflet-left {
+#forecasts-map .leaflet-top.leaflet-right {
   width: 100%;
   display: flex;
   justify-content: center;
 }
 
-.leaflet-left .leaflet-control {
+#forecasts-map .leaflet-right .leaflet-control {
   margin-left: 0;
 }
 </style>

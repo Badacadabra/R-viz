@@ -1,9 +1,10 @@
 <template>
-  <div id="map" ref="map"></div>
+  <div id="atmo-map"></div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { getPlatforms } from '@ionic/vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as Vector from 'esri-leaflet-vector';
@@ -38,13 +39,26 @@ export default defineComponent({
   },
   methods: {
     setupLeafletMap(): void {
+      // Handle different platforms
+      let zoomControl = false,
+          zoomLevel = 7;
+
+      if (getPlatforms().includes('tablet') && window.innerWidth >= 700) {
+        zoomLevel = 8;
+      }
+
+      if (getPlatforms().includes('desktop') && window.innerWidth >= 1500) {
+        zoomControl = true;
+        zoomLevel = 8;
+      }
+
       // Init map
-      this.map = L.map('map', {
-        zoomControl: false,
-        minZoom: 7,
+      this.map = L.map('atmo-map', {
+        zoomControl,
+        minZoom: zoomLevel,
         maxZoom: 17,
         attributionControl: false
-      }).setView(this.center, 7);
+      }).setView(this.center, zoomLevel);
 
       // Fix problem with tile loading
       this.map.whenReady(() => {
@@ -111,8 +125,8 @@ export default defineComponent({
 </script>
 
 <style>
-#map {
- width: 100%;
- height: 80%;
+#atmo-map {
+  width: 100%;
+  height: 90%;
 }
 </style>

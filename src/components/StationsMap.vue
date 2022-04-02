@@ -1,5 +1,5 @@
 <template>
-  <div id="map"></div>
+  <div id="stations-map"></div>
 </template>
 
 <script lang="ts">
@@ -47,7 +47,7 @@ export default defineComponent({
   methods: {
     setupLeafletMap(): void {
       // Init map
-      this.map = L.map('map', {
+      this.map = L.map('stations-map', {
         zoomControl: false,
         minZoom: 7,
         maxZoom: 17,
@@ -151,21 +151,21 @@ export default defineComponent({
 </script>
 
 <style>
-#map {
+#stations-map {
  width: 100%;
  height: 350px;
 }
 
-.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+#stations-map .leaflet-popup-content-wrapper, #stations-map .leaflet-popup-tip {
   box-shadow: 0 1px 3px rgba(0,0,0,0.4);
   border-radius: 5px;
 }
 
-.leaflet-popup-content p {
+#stations-map .leaflet-popup-content p {
   margin: 10px 0;
 }
 
-.counter {
+#stations-map .counter {
   background-color: white;
   border-radius: 5px;
   padding: 5px;

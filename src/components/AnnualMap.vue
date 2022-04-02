@@ -1,9 +1,10 @@
 <template>
-  <div id="map" ref="map"></div>
+  <div id="annual-map" ref="annualMap"></div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { getPlatforms } from '@ionic/vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as Vector from 'esri-leaflet-vector';
@@ -42,13 +43,26 @@ export default defineComponent({
   },
   methods: {
     setupLeafletMap(): void {
+      // Handle different platforms
+      let zoomControl = false,
+          zoomLevel = 7;
+
+      if (getPlatforms().includes('tablet') && window.innerWidth >= 700) {
+        zoomLevel = 8;
+      }
+
+      if (getPlatforms().includes('desktop') && window.innerWidth >= 1500) {
+        zoomControl = true;
+        zoomLevel = 8;
+      }
+
       // Init map
-      this.map = L.map('map', {
-        zoomControl: false,
-        minZoom: 7,
+      this.map = L.map('annual-map', {
+        zoomControl,
+        minZoom: zoomLevel,
         maxZoom: 17,
         attributionControl: false
-      }).setView(this.center, 7);
+      }).setView(this.center, zoomLevel);
 
       // Fix problem with tile loading
       this.map.whenReady(() => {
@@ -92,7 +106,7 @@ export default defineComponent({
       menu.addTo(this.map);
 
       // Event listeners
-      const buttons = this.$refs.map.querySelectorAll('.pollutantSelector');
+      const buttons = this.$refs.annualMap.querySelectorAll('.pollutantSelector');
 
       for (let button of buttons) {
         button.addEventListener('click', (e) => {
@@ -147,43 +161,40 @@ export default defineComponent({
 </script>
 
 <style>
-#map {
+#annual-map {
  width: 100%;
  height: 90%;
 }
 
-.menu, .pollutantSelector {
+#annual-map .menu, #annual-map .pollutantSelector {
   background-color: white;
   border-radius: 20px;
 }
 
-.pollutantSelector {
+#annual-map .pollutantSelector {
   padding: 10px;
 }
 
-.active {
+#annual-map .active {
   color: white;
   background-color: var(--ion-color-secondary) !important;
 }
 
-.leaflet-top.leaflet-left {
+#annual-map .leaflet-top.leaflet-left .year {
+  margin: 0;
   padding: 8px;
   margin-top: 10px;
   background-color: var(--ion-color-tertiary);
   border-radius: 0 5px 5px 0;
 }
 
-.leaflet-top.leaflet-left .year {
-  margin: 0;
-}
-
-.leaflet-top.leaflet-right {
+#annual-map .leaflet-top.leaflet-right {
   width: 100%;
   display: flex;
   justify-content: right;
 }
 
-.leaflet-right .leaflet-control {
+#annual-map .leaflet-right .leaflet-control {
   margin-left: 0;
 }
 </style>

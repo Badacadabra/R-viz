@@ -1,5 +1,5 @@
 <template>
-  <div id="map"></div>
+  <div id="episodes-map"></div>
 </template>
 
 <script lang="ts">
@@ -34,7 +34,7 @@ export default defineComponent({
   methods: {
     setupLeafletMap(): void {
       // Init map
-      this.map = L.map('map', {
+      this.map = L.map('episodes-map', {
         zoomControl: false,
         minZoom: 7,
         maxZoom: 17,
@@ -86,7 +86,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-#map {
+#episodes-map {
  width: 100%;
  height: 350px;
 }

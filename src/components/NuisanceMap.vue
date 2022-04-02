@@ -6,7 +6,7 @@
     :buttons="['OK']"
     @didDismiss="hideAlert()"
   ></ion-alert>
-  <div id="map"></div>
+  <div id="nuisance-map"></div>
   <ion-modal class="main-modal" :is-open="isModalOpened">
     <ion-header>
       <ion-toolbar color="primary">
@@ -146,6 +146,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { getPlatforms } from '@ionic/vue';
 import { IonModal, IonButtons, IonButton, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonListHeader, IonItem, IonLabel, IonIcon, IonAlert } from '@ionic/vue';
 import { close } from 'ionicons/icons';
 import axios from 'axios';
@@ -240,14 +241,27 @@ export default defineComponent({
       this.isAlertDisplayed = false;
     },
     setupLeafletMap(): void {
+      // Handle different platforms
+      let zoomControl = false,
+          zoomLevel = 7;
+
+      if (getPlatforms().includes('tablet') && window.innerWidth >= 700) {
+        zoomLevel = 8;
+      }
+
+      if (getPlatforms().includes('desktop') && window.innerWidth >= 1500) {
+        zoomControl = true;
+        zoomLevel = 8;
+      }
+
       // Init map
-      this.map = L.map('map', {
-        zoomControl: false,
-        minZoom: 7,
+      this.map = L.map('nuisance-map', {
+        zoomControl,
+        minZoom: zoomLevel,
         maxZoom: 17,
         attributionControl: false,
         tap: false
-      }).setView(this.center, 7);
+      }).setView(this.center, zoomLevel);
 
       // Fix problem with tile loading
       this.map.whenReady(() => {
@@ -482,36 +496,36 @@ export default defineComponent({
 </script>
 
 <style>
-#map {
+#nuisance-map {
  width: 100%;
  height: 75%;
 }
 
-.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+#nuisance-map .leaflet-popup-content-wrapper, #nuisance-map .leaflet-popup-tip {
   box-shadow: 0 1px 3px rgba(0,0,0,0.4);
   border-radius: 5px;
 }
 
-.leaflet-popup-content h4 {
+#nuisance-map .leaflet-popup-content h4 {
   font-size: 1.3em;
   margin-bottom: 5px;
 }
 
-.leaflet-popup-content hr {
+#nuisance-map .leaflet-popup-content hr {
   border: solid 1px #e9e9ed;
 }
 
-.leaflet-popup-content p {
+#nuisance-map .leaflet-popup-content p {
   margin: 10px 0;
 }
 
-.counter {
+#nuisance-map .counter {
   background-color: white;
   border-radius: 5px;
   padding: 5px;
 }
 
-button.details {
+#nuisance-map button.details {
   color: black;
   background-color: #e9e9ed;
   width: 180px;
