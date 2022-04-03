@@ -1,0 +1,14 @@
+{
+  "dest": "release-builds/",
+  "icon": "resources/icon.png",
+  "name": "r-viz",
+  "productName": "R-viz",
+  "description": "L'application de visualisation de données par AtmoSud.",
+  "productDescription": "Application de visualisation des données pour la qualité de l'air en Région Sud Provence-Alpes-Côte d'Azur.",
+  "categories": [
+    "Science"
+  ],
+  "lintianOverrides": [
+    "changelog-file-missing-in-native-package"
+  ]
+}
