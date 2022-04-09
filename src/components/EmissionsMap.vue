@@ -100,7 +100,7 @@ export default defineComponent({
 
       this.legend = ctrl({ position: 'topleft' });
 
-      this.legend.onAdd = map => {
+      this.legend.onAdd = () => {
         let div = L.DomUtil.create('div', 'legend'),
             grades = [];
 

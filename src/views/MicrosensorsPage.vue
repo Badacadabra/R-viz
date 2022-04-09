@@ -249,7 +249,7 @@ export default defineComponent({
       date.setDate(date.getDate() - 1);
       return format(date, 'yyyy-MM-dd');
     },
-    selectCampaign(e: CustomEvent): void {
+    selectCampaign(): void {
       this.selectedMicrosensorId = 0;
       this.selectedVariables = [];
       this.measurements = [];
@@ -265,7 +265,7 @@ export default defineComponent({
       this.measurements = [];
       this.variables = this.microsensors.find(sensor => sensor.id_site === (e.target as any).value).variables.split(', ').sort((a, b) => a.localeCompare(b));
     },
-    selectVariables(e: CustomEvent): void {
+    selectVariables(): void {
       this.measurements = [];
     },
     showMicrosensors(): void {

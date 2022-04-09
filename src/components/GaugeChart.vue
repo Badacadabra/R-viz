@@ -79,7 +79,7 @@ export default defineComponent({
     clockHand.hand.set('fill', am5.color('#4c595e'));
     clockHand.pin.set('fill', am5.color('#4c595e'));
 
-    let bullet = axisDataItem.set('bullet', am5xy.AxisBullet.new(root, {
+    axisDataItem.set('bullet', am5xy.AxisBullet.new(root, {
       sprite: clockHand
     }));
 

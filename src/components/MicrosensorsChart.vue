@@ -58,7 +58,7 @@ export default defineComponent({
         layout: root.verticalLayout
       }));
 
-      let title = chart.children.unshift(am5.Label.new(root, {
+      chart.children.unshift(am5.Label.new(root, {
         text: this.selectedVariableName,
         fontSize: 17,
         fontWeight: '500',

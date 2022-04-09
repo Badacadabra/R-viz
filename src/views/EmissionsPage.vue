@@ -234,7 +234,7 @@ export default defineComponent({
         this.getData();
       }
     },
-    selectEpci(e: CustomEvent): void {
+    selectEpci(): void {
       if (this.selectedEpciCode !== '') {
         this.isDataLoaded = false;
         this.getData();

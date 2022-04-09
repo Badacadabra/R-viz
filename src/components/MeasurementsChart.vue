@@ -68,7 +68,7 @@ export default defineComponent({
         layout: root.verticalLayout
       }));
 
-      let title = chart.children.unshift(am5.Label.new(root, {
+      chart.children.unshift(am5.Label.new(root, {
         text: this.accessType === 'station' ? this.pollutantInfo.label : this.stationInfo.nom,
         fontSize: 17,
         fontWeight: '500',

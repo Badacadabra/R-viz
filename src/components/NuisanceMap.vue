@@ -215,8 +215,8 @@ export default defineComponent({
   data(): myData {
     return{
       isAlertDisplayed: false,
-      startDate: this.start!,
-      endDate: this.end!,
+      startDate: this.start,
+      endDate: this.end,
       map: null,
       center: [43.938, 6.022], // Entrevennes
       clusters: null,
