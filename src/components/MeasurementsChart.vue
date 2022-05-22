@@ -1,6 +1,6 @@
 <template>
   <div id="line-chart" ref="lineChart" v-if="!noMeasurementsMessage"></div>
-  <p v-else>Mesures indisponibles : <strong>{{ pollutantInfo.label }}</strong></p>
+  <p v-else>Mesures indisponibles : <strong>{{ selectedPollutant.label }}</strong></p>
 </template>
 
 <script lang="ts">
@@ -12,7 +12,7 @@ import am5locales_fr_FR from '@amcharts/amcharts5/locales/fr_FR';
 
 interface myData {
   apiObj: any;
-  selectedPollutantCode: string;
+  selectedPollutant: any;
   selectedStationCode: string;
   accessType: string;
   stationInfo: any;
@@ -25,13 +25,13 @@ export default defineComponent({
   props: {
     api: Object,
     station: String,
-    pollutant: String,
+    pollutant: Object,
     access: String
   },
   data(): myData {
     return {
       apiObj: this.api,
-      selectedPollutantCode: this.pollutant,
+      selectedPollutant: this.pollutant,
       selectedStationCode: this.station,
       accessType: this.access,
       stationInfo: null,
@@ -41,9 +41,24 @@ export default defineComponent({
   },
   mounted(): void {
     this.stationInfo = this.apiObj.data.stations.find(station => station.station_id === this.selectedStationCode);
-    this.pollutantInfo = this.stationInfo.polluants.find(pollutant => pollutant.polluant_id === this.selectedPollutantCode);
 
-    if (this.pollutantInfo.mesures.length > 0) {
+    console.log(this.selectedPollutant);
+
+    if (this.selectedPollutant.methode_mesure) {
+      if (this.selectedPollutant.methode_mesure === 'automatique') {
+        this.pollutantInfo = this.stationInfo.polluants.find(pollutant => pollutant.polluant_id === this.selectedPollutant.polluant_id);
+      } else { // manuelle
+        this.pollutantInfo = this.stationInfo.polluants.find(pollutant => pollutant.polluant_id === this.selectedPollutant.polluant_id + '_diff');
+      }
+    } else {
+      this.pollutantInfo = this.stationInfo.polluants.find(pollutant => pollutant.polluant_id === this.selectedPollutant.polluant_id);
+
+      if (!this.pollutantInfo) {
+        this.pollutantInfo = this.stationInfo.polluants.find(pollutant => pollutant.polluant_id === this.selectedPollutant.polluant_id + '_diff');
+      }
+    }
+
+    if (this.pollutantInfo && (this.selectedPollutant.methode_mesure === 'automatique' || !this.pollutantInfo.polluant_id.includes('_diff')) && this.pollutantInfo.mesures.length > 0) {
       // Create root element
       // https://www.amcharts.com/docs/v5/getting-started/#Root_element
       let root = am5.Root.new(this.$refs.lineChart as HTMLElement);
@@ -66,6 +81,18 @@ export default defineComponent({
         paddingLeft: 0,
         paddingRight: 10,
         layout: root.verticalLayout
+      }));
+
+      chart.children.unshift(am5.Label.new(root, {
+        text: this.selectedPollutant.methode_mesure ? `Mesure ${this.selectedPollutant.methode_mesure}` : '',
+        fontSize: 15,
+        fontWeight: '400',
+        textAlign: 'center',
+        x: am5.percent(50),
+        centerX: am5.percent(50),
+        y: 15,
+        paddingTop: 0,
+        paddingBottom: 0
       }));
 
       chart.children.unshift(am5.Label.new(root, {
@@ -121,7 +148,7 @@ export default defineComponent({
       let timeUnit = '' as any,
           count = 0;
 
-      switch (this.pollutantInfo.mesures[0].temporalite) {
+      switch (this.pollutantInfo.temporalite) {
         case 'quart-horaire':
           timeUnit = 'minute';
           count = 15;
@@ -223,7 +250,7 @@ export default defineComponent({
       }));
 
       let ref = chart.series.push(am5xy.LineSeries.new(root, {
-        name: (this.pollutantInfo.mesures[0].courbes_references.length) ? this.pollutantInfo.mesures[0].courbes_references[0].label : 'Courbes de référence',
+        name: this.pollutantInfo.courbes_references[0].label,
         xAxis: xAxis,
         yAxis: yAxis,
         valueYField: 'max',
@@ -261,6 +288,149 @@ export default defineComponent({
       // https://www.amcharts.com/docs/v5/concepts/animations/
       concentrations.appear(1000);
       ref.appear(1000);
+      chart.appear(1000, 100);
+
+    } else if (this.pollutantInfo && (this.selectedPollutant.methode_mesure === 'manuelle' || this.pollutantInfo.polluant_id.includes('_diff')) && this.pollutantInfo.mesures.length > 0) {
+      // Create root element
+      // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+      let root = am5.Root.new(this.$refs.lineChart as HTMLElement);
+      root.locale = am5locales_fr_FR;
+
+
+      // Set themes
+      // https://www.amcharts.com/docs/v5/concepts/themes/
+      root.setThemes([
+        am5themes_Animated.new(root)
+      ]);
+
+
+      // Create chart
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/
+      let chart = root.container.children.push(am5xy.XYChart.new(root, {
+        panX: false,
+        panY: false,
+        paddingTop: 20,
+        paddingBottom: 20,
+        paddingLeft: 0,
+        paddingRight: 10,
+        layout: root.verticalLayout
+      }));
+
+      chart.get('colors').set('step', 3);
+
+      chart.children.unshift(am5.Label.new(root, {
+        text: this.selectedPollutant.methode_mesure ? `Mesure ${this.selectedPollutant.methode_mesure}` : '',
+        fontSize: 15,
+        fontWeight: '400',
+        textAlign: 'center',
+        x: am5.percent(50),
+        centerX: am5.percent(50),
+        y: 15,
+        paddingTop: 0,
+        paddingBottom: 0
+      }));
+
+      chart.children.unshift(am5.Label.new(root, {
+        text: this.accessType === 'station' ? this.pollutantInfo.label : this.stationInfo.nom,
+        fontSize: 17,
+        fontWeight: '500',
+        textAlign: 'center',
+        x: am5.percent(50),
+        centerX: am5.percent(50),
+        y: -4,
+        paddingTop: 0,
+        paddingBottom: 0
+      }));
+
+
+      // Add cursor
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+      chart.set('cursor', am5xy.XYCursor.new(root, {}));
+
+
+      // Create axes
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+      let xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+        maxDeviation: 0.2,
+        baseInterval: {
+          timeUnit: 'day',
+          count: 1
+        },
+        renderer: am5xy.AxisRendererX.new(root, {
+          minGridDistance: 50
+        }),
+        tooltip: am5.Tooltip.new(root, {})
+      }));
+
+      let yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+        min: 0,
+        renderer: am5xy.AxisRendererY.new(root, {}),
+        tooltip: am5.Tooltip.new(root, {})
+      }));
+
+      yAxis.children.unshift(
+        am5.Label.new(root, {
+          rotation: -90,
+          text: this.pollutantInfo.unite,
+          y: am5.p50,
+          centerX: am5.p50
+        })
+      );
+
+
+      // Create series
+      // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+      let series = chart.series.push(am5xy.ColumnSeries.new(root, {
+        xAxis: xAxis,
+        yAxis: yAxis,
+        baseAxis: yAxis,
+        valueXField: 'close',
+        openValueXField: 'open',
+        valueYField: 'concentration'
+      }));
+
+      series.columns.template.setAll({
+        height: 0.5
+      });
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root, {
+          locationX: 0,
+          sprite: am5.Circle.new(root, {
+            radius: 2,
+            fill: series.get('fill')
+          })
+        })
+      })
+
+      series.bullets.push(function() {
+        return am5.Bullet.new(root, {
+          locationX: 1,
+          sprite: am5.Circle.new(root, {
+            radius: 2,
+            fill: series.get('fill')
+          })
+        })
+      })
+
+      // Set data
+      let data = [];
+
+      for (let measurement of this.pollutantInfo.mesures) {
+        data.push({
+          concentration: measurement.valeur,
+          open: new Date(measurement.date_debut).getTime(),
+          close: new Date(measurement.date_fin).getTime()
+        });
+      }
+
+      yAxis.data.setAll(data);
+      series.data.setAll(data);
+
+
+      // Make stuff animate on load
+      // https://www.amcharts.com/docs/v5/concepts/animations/
+      series.appear(1000);
       chart.appear(1000, 100);
 
     } else {

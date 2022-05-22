@@ -127,7 +127,7 @@ export default defineComponent({
     },
     addRaster(): void {
       this.currentLayer = L.tileLayer.wms('https://geoservices.atmosud.org/geoserver/wms?', {
-        layers: `paca-${this.selectedPollutantId}-${this.currentDate}`,
+        layers: `azurjour:paca-${this.selectedPollutantId}-${this.currentDate}`,
         format: 'image/png',
         version: '1.1.1',
         crs: L.CRS.EPSG4326,

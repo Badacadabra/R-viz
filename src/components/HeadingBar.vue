@@ -30,7 +30,7 @@
           <ion-card-title>C'est quoi, R-viz ?</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          R-viz est une application mobile de visualisation de données relatives à la qualité de l'air en Région Sud Provence-Alpes-Côte d'Azur. Développée par <strong>AtmoSud</strong>, cette application vous permet de visualiser, avec un ensemble de cartes et de graphes, des données utiles sur tout le territoire : l'indice ATMO, les prévisions détaillées, l'indice pollinique, les mesures aux stations, les épisodes de pollution, l'exposition des populations, les émissions de polluants, les cartes annuelles, les microcapteurs et les signalements de nuisances.
+          R-viz est une application de visualisation de données relatives à la qualité de l'air en Région Sud Provence-Alpes-Côte d'Azur. Développée par <strong>AtmoSud</strong>, cette application vous permet de visualiser, avec un ensemble de cartes et de graphes, des données utiles sur tout le territoire : l'indice ATMO, les prévisions détaillées, l'indice pollinique, les mesures aux stations, les épisodes de pollution, l'exposition des populations, les émissions de polluants, les cartes annuelles, les microcapteurs et les signalements de nuisances.
         </ion-card-content>
       </ion-card>
       <ion-card>

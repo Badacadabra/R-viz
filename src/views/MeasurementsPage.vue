@@ -120,25 +120,25 @@
       <ion-item v-if="access === 'station' && stationsFromAccessByStation.length > 0">
         <ion-label>Station</ion-label>
         <ion-select placeholder="Votre sélection" ok-text="OK" cancel-text="Annuler" v-model="selectedStation" @ionChange="selectStation($event)">
-          <ion-select-option v-for="station in stationsFromAccessByStation" :key="station.station_id" :value="station.station_id" :class="station.nom ? (station.nom.length > 20 ? 'radio-wrap' : '') : ''">{{ station.nom }}</ion-select-option>
+          <ion-select-option v-for="station in stationsFromAccessByStation" :key="station.station_id" :value="station.station_id" :class="station.nom ? (station.nom.length > 25 ? 'radio-wrap' : '') : ''">{{ station.nom }}</ion-select-option>
         </ion-select>
       </ion-item>
       <ion-item v-if="access === 'station' && pollutantsFromAccessByStation.length > 0">
         <ion-label>Polluant(s)</ion-label>
-        <ion-select multiple placeholder="Votre sélection" ok-text="OK" cancel-text="Annuler" v-model="selectedPollutants">
-          <ion-select-option v-for="pollutant in pollutantsFromAccessByStation" :key="pollutant.polluant_id" :value="pollutant.polluant_id" :class="pollutant.label.length > 20 ? 'checkbox-wrap' : ''">{{ pollutant.label }}</ion-select-option>
+        <ion-select multiple placeholder="Votre sélection" ok-text="OK" cancel-text="Annuler" v-model="selectedPollutants" @ionChange="changePollutantsInAccessByStation()">
+          <ion-select-option v-for="pollutant in pollutantsFromAccessByStation" :key="pollutant.polluant_id" :value="pollutant" :class="pollutant.label.length > 50 ? 'checkbox-wrap' : ''">{{ pollutant.label }}</ion-select-option>
         </ion-select>
       </ion-item>
       <ion-item v-if="access === 'pollutant' && pollutantsFromAccessByPollutant.length > 0">
         <ion-label>Polluant</ion-label>
         <ion-select placeholder="Votre sélection" ok-text="OK" cancel-text="Annuler" v-model="selectedPollutant" @ionChange="selectPollutant($event)">
-          <ion-select-option v-for="pollutant in pollutantsFromAccessByPollutant" :key="pollutant.polluant_id" :value="pollutant.polluant_id" :class="pollutant.label.length > 20 ? 'radio-wrap' : ''">{{ pollutant.label }}</ion-select-option>
+          <ion-select-option v-for="pollutant in pollutantsFromAccessByPollutant" :key="pollutant.polluant_id" :value="pollutant" :class="pollutant.label.length > 30 ? 'radio-wrap' : ''">{{ pollutant.label }}</ion-select-option>
         </ion-select>
       </ion-item>
       <ion-item v-if="access === 'pollutant' && stationsFromAccessByPollutant.length > 0">
         <ion-label>Station(s)</ion-label>
-        <ion-select multiple placeholder="Votre sélection" ok-text="OK" cancel-text="Annuler" v-model="selectedStations">
-          <ion-select-option v-for="station in stationsFromAccessByPollutant" :key="station.station_id" :value="station.station_id" :class="station.nom ? (station.nom.length > 20 ? 'checkbox-wrap' : '') : ''">{{ station.nom }}</ion-select-option>
+        <ion-select multiple placeholder="Votre sélection" ok-text="OK" cancel-text="Annuler" v-model="selectedStations" @ionChange="changeStationsInAccessByPollutant()">
+          <ion-select-option v-for="station in stationsFromAccessByPollutant" :key="station.station_id" :value="station.station_id" :class="station.nom ? (station.nom.length > 25 ? 'checkbox-wrap' : '') : ''">{{ station.nom }}</ion-select-option>
         </ion-select>
       </ion-item>
       <div id="buttons">
@@ -167,16 +167,16 @@
         <ion-icon :icon="analytics"></ion-icon>
       </ion-item>
       <div v-if="measurementsByStation">
-        <ion-card v-for="(testPoll, i) in pollsTestAura" :key="i">
+        <ion-card v-for="(selectedPollutant, i) in selectedPollutants" :key="i">
           <ion-card-content>
-            <MeasurementsChart :api="measurementsByStation" :station="selectedStationAura" :pollutant="testPoll" :access="access" :key="key" />
+            <MeasurementsChart :api="measurementsByStation" :station="selectedStation" :pollutant="selectedPollutant" :access="access" :key="key" />
           </ion-card-content>
         </ion-card>
       </div>
       <div v-if="measurementsByPollutant">
-        <ion-card v-for="(testStation, i) in stationsTestAura" :key="i">
+        <ion-card v-for="(selectedStation, i) in selectedStations" :key="i">
           <ion-card-content>
-            <MeasurementsChart :api="measurementsByPollutant" :pollutant="selectedPollAura" :station="testStation" :access="access" :key="key" />
+            <MeasurementsChart :api="measurementsByPollutant" :pollutant="selectedPollutant" :station="selectedStation" :access="access" :key="key" />
           </ion-card-content>
         </ion-card>
       </div>
@@ -209,7 +209,7 @@ interface myData {
   measurementsByPollutant: any;
   selectedStation: string;
   selectedPollutants: [];
-  selectedPollutant: string;
+  selectedPollutant: any;
   selectedStations: [];
   stationInfo: string;
   areChartsLoaded: boolean;
@@ -219,10 +219,6 @@ interface myData {
   temporaryActive: boolean;
   closedActive: boolean;
   key: number;
-  selectedStationAura: string;
-  selectedPollAura: string;
-  pollsTestAura: [string, string, string];
-  stationsTestAura: [string, string];
 }
 
 export default defineComponent({
@@ -270,7 +266,7 @@ export default defineComponent({
       measurementsByPollutant: null,
       selectedStation: '',
       selectedPollutants: [],
-      selectedPollutant: '',
+      selectedPollutant: null,
       selectedStations: [],
       stationInfo: 'fixed',
       areChartsLoaded: true,
@@ -279,11 +275,7 @@ export default defineComponent({
       fixedActive: true,
       temporaryActive: false,
       closedActive: false,
-      key: 0,
-      selectedStationAura: 'FR20062',
-      selectedPollAura: '08',
-      pollsTestAura: ['08', '03', '01'],
-      stationsTestAura: ['FR20062', 'FR20017']
+      key: 0
     };
   },
   computed: {
@@ -323,7 +315,7 @@ export default defineComponent({
     accessStations(): void {
       this.measurementsByStation = null;
       this.measurementsByPollutant = null;
-      this.selectedPollutant = '';
+      this.selectedPollutant = null;
       this.selectedStations = [];
       this.stationsFromAccessByPollutant = [];
     },
@@ -368,10 +360,20 @@ export default defineComponent({
       this.stationInfo = info;
     },
     selectStation(e: CustomEvent): void {
+      this.measurementsByStation = null;
+      this.selectedPollutants = [];
       this.pollutantsFromAccessByStation = this.stationsFromAccessByStation.find(station => station.station_id === (e.target as any).value).polluants.sort((a, b) => a.label.localeCompare(b.label));
     },
     selectPollutant(e: CustomEvent): void {
-      this.stationsFromAccessByPollutant = this.pollutantsFromAccessByPollutant.find(pollutant => pollutant.polluant_id === (e.target as any).value).stations.sort((a, b) => a.nom.localeCompare(b.nom));
+      this.measurementsByPollutant = null;
+      this.selectedStations = [];
+      this.stationsFromAccessByPollutant = this.pollutantsFromAccessByPollutant.find(pollutant => pollutant.polluant_id === (e.target as any).value.polluant_id).stations.sort((a, b) => a.nom.localeCompare(b.nom));
+    },
+    changePollutantsInAccessByStation(): void {
+      this.measurementsByStation = null;
+    },
+    changeStationsInAccessByPollutant(): void {
+      this.measurementsByPollutant = null;
     },
     displayMeasurements(): void {
       this.areChartsLoaded = false;
@@ -379,11 +381,15 @@ export default defineComponent({
       let url = '';
 
       if (this.access === 'station') {
-        url = `https://api.atmo-aura.fr/siam/v0/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&station_id=${this.selectedStationAura}&polluant_id=${this.pollsTestAura.toString()}&api_token=8886b4e5f2fbb8ef1b8b6a4b18007938`;
-        // https://preprod-api.atmosud.org/siam/v1/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&station_id=${this.selectedStation}&polluant_id=${this.selectedPollutants.toString()}
+        let selectedPollutantsIds = [];
+
+        for (let selectedPollutant of this.selectedPollutants) {
+          selectedPollutantsIds.push(selectedPollutant.polluant_id);
+        }
+
+        url = `https://preprod-api.atmosud.org/siam/v1/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&station_id=${this.selectedStation}&polluant_id=${selectedPollutantsIds.toString()}`;
       } else {
-        url = `https://api.atmo-aura.fr/siam/v0/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&polluant_id=${this.selectedPollAura}&station_id=${this.stationsTestAura.toString()}&api_token=8886b4e5f2fbb8ef1b8b6a4b18007938`;
-        // https://preprod-api.atmosud.org/siam/v1/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&polluant_id=${this.selectedPollutant}&station_id=${this.selectedStations.toString()}}
+        url = `https://preprod-api.atmosud.org/siam/v1/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&polluant_id=${this.selectedPollutant.polluant_id}&station_id=${this.selectedStations.toString()}`;
       }
 
       axios.get(url)
@@ -442,11 +448,11 @@ export default defineComponent({
 
 <style>
 .radio-wrap.alert-tappable.sc-ion-alert-md {
-  height: 50px;
+  height: 80px;
 }
 
 .checkbox-wrap.alert-tappable.sc-ion-alert-md {
-  height: 80px;
+  height: 120px;
 }
 
 .alert-radio-label.sc-ion-alert-md,

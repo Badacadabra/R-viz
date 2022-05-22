@@ -41,7 +41,7 @@
         </ion-card-content>
       </ion-card>
       <ion-list v-if="taxons.length > 0">
-        <ion-item v-for="taxon in taxons" :key="taxon.indexNb">
+        <ion-item v-for="(taxon, i) in taxons" :key="i">
           <ion-label>
             <h3>{{ taxon.label }}</h3>
           </ion-label>
@@ -167,7 +167,7 @@ export default defineComponent({
       this.cities = [];
       this.userInput = '';
 
-      axios.get('https://api.atmo-aura.fr/siam/v0/communes/69123?api_token=8886b4e5f2fbb8ef1b8b6a4b18007938')
+      axios.get(`https://preprod-api.atmosud.org/siam/v1/communes/${this.selectedCity.code}`)
         .then(response => {
           let mainIndex = response.data.data.legendes.indice_pollen.find(i => i.indice === response.data.data.pollens.indice_pollen);
 
