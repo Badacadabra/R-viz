@@ -90,13 +90,13 @@ export default defineComponent({
     },
     addMicrosensors(): void {
       let firstIcon = L.icon({
-        iconUrl: '/assets/img/capteur-diams.png',
+        iconUrl: '/app/assets/img/capteur-diams.png',
         iconSize: [36, 36],
         iconAnchor: [18, 18]
       });
 
       let secondIcon = L.icon({
-        iconUrl: '/assets/img/capteur-nature4citylife.png',
+        iconUrl: '/app/assets/img/capteur-nature4citylife.png',
         iconSize: [36, 36],
         iconAnchor: [18, 18]
       });

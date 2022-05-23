@@ -320,19 +320,19 @@ export default defineComponent({
 
       switch (type) {
         case 'Odeur':
-          iconFile = '/assets/img/odeur.png';
+          iconFile = '/app/assets/img/odeur.png';
           url = 'https://www.signalair.eu/fr/flux/geojson/gq1jrnp9';
           break;
         case 'Bruit':
-          iconFile = '/assets/img/son.png';
+          iconFile = '/app/assets/img/son.png';
           url = 'https://www.signalair.eu/fr/flux/geojson/yq7b5jal';
           break;
         case 'Visuel':
-          iconFile = '/assets/img/visuel.png';
+          iconFile = '/app/assets/img/visuel.png';
           url = 'https://www.signalair.eu/fr/flux/geojson/28qg73y9';
           break;
         case 'Brûlage':
-          iconFile = '/assets/img/brulage.png';
+          iconFile = '/app/assets/img/brulage.png';
           url = 'https://www.signalair.eu/fr/flux/geojson/yib5aa1n';
           break;
       }

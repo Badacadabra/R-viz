@@ -2,7 +2,7 @@
   <ion-page>
     <HeadingBar title="Nuisances" :back="true" />
     <ion-content color="light" :scroll-y="false" :fullscreen="true">
-      <img id="signalair" src="/assets/img/logo-signalair.png">
+      <img id="signalair" src="/app/assets/img/logo-signalair.png">
       <div id="buttons">
         <ion-button id="open-start-modal" color="secondary" fill="outline">
           <ion-icon slot="start" :icon="calendarOutline"></ion-icon>
@@ -26,19 +26,19 @@
       <p id="period">Du <strong>{{ formatStartDate }}</strong> au <strong>{{ formatEndDate }}</strong></p>
       <div id="legend">
         <figure>
-          <img src="/assets/img/odeur.png" alt="Odeur">
+          <img src="/app/assets/img/odeur.png" alt="Odeur">
           <figcaption>Odeur</figcaption>
         </figure>
         <figure>
-          <img src="/assets/img/son.png" alt="Son/bruit">
+          <img src="/app/assets/img/son.png" alt="Son/bruit">
           <figcaption>Son/bruit</figcaption>
         </figure>
         <figure>
-          <img src="/assets/img/visuel.png" alt="Visuel">
+          <img src="/app/assets/img/visuel.png" alt="Visuel">
           <figcaption>Visuel</figcaption>
         </figure>
         <figure>
-          <img src="/assets/img/brulage.png" alt="Brûlage">
+          <img src="/app/assets/img/brulage.png" alt="Brûlage">
           <figcaption>Brûlage</figcaption>
         </figure>
       </div>

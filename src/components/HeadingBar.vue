@@ -24,7 +24,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content color="light" :fullscreen="true">
-      <ion-img class="logo" src="/assets/img/logo-atmosud.png" alt="Logo d'AtmoSud"></ion-img>
+      <ion-img class="logo" src="/app/assets/img/logo-atmosud.png" alt="Logo d'AtmoSud"></ion-img>
       <ion-card>
         <ion-card-header>
           <ion-card-title>C'est quoi, R-viz ?</ion-card-title>

@@ -29,11 +29,11 @@
         <ion-content color="light" fullscreen>
           <div id="legend">
             <figure :class="{active: diamsActive, menu: true}" @click="displayMicrosensorsOnMap(12)">
-              <img src="/assets/img/capteur-diams.png" alt="DIAMS">
+              <img src="/app/assets/img/capteur-diams.png" alt="DIAMS">
               <figcaption>DIAMS</figcaption>
             </figure>
             <figure :class="{active: nature4citylifeActive, menu: true}" @click="displayMicrosensorsOnMap(5)">
-              <img src="/assets/img/capteur-nature4citylife.png" alt="Nature4CityLife">
+              <img src="/app/assets/img/capteur-nature4citylife.png" alt="Nature4CityLife">
               <figcaption>Nature4CityLife</figcaption>
             </figure>
           </div>

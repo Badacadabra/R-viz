@@ -22,7 +22,7 @@
           </ion-item>
         </div>
       </ion-list>
-      <img id="rnsa" src="/assets/img/logo-rnsa.svg">
+      <img id="rnsa" src="/app/assets/img/logo-rnsa.svg">
       <ion-item id="previz" v-if="!selectedCity">
         <ion-icon :icon="flower"></ion-icon>
       </ion-item>

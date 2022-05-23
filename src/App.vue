@@ -61,7 +61,7 @@
         </ion-header>
         <ion-content>
           <ion-card class="services" href="https://api.atmosud.org" target="_blank">
-            <ion-img src="/assets/img/api.png"></ion-img>
+            <ion-img src="/app/assets/img/api.png"></ion-img>
             <ion-card-header>
               <ion-card-title>APIs</ion-card-title>
             </ion-card-header>
@@ -70,7 +70,7 @@
             </ion-card-content>
           </ion-card>
           <ion-card class="services" href="https://opendata.atmosud.org" target="_blank">
-            <ion-img src="/assets/img/open-data.png"></ion-img>
+            <ion-img src="/app/assets/img/open-data.png"></ion-img>
             <ion-card-header>
               <ion-card-title>Open Data</ion-card-title>
             </ion-card-header>
@@ -79,7 +79,7 @@
             </ion-card-content>
           </ion-card>
           <ion-card class="services" href="https://cigale.atmosud.org/" target="_blank">
-            <ion-img src="/assets/img/cigale.png"></ion-img>
+            <ion-img src="/app/assets/img/cigale.png"></ion-img>
             <ion-card-header>
               <ion-card-title>CIGALE</ion-card-title>
             </ion-card-header>
@@ -88,7 +88,7 @@
             </ion-card-content>
           </ion-card>
           <ion-card class="services" href="https://www.signalair.eu/fr/" target="_blank">
-            <ion-img src="/assets/img/signalair.png"></ion-img>
+            <ion-img src="/app/assets/img/signalair.png"></ion-img>
             <ion-card-header>
               <ion-card-title>SignalAir</ion-card-title>
             </ion-card-header>
@@ -146,11 +146,6 @@ export default defineComponent({
 </script>
 
 <style>
-:root {
-  scrollbar-color: #fbb911 #ffffff;
-  scrollbar-width: thin;
-}
-
 @media screen and (max-width: 992px) {
   ion-menu {
     display: none;

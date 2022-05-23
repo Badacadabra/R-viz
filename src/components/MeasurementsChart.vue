@@ -42,8 +42,6 @@ export default defineComponent({
   mounted(): void {
     this.stationInfo = this.apiObj.data.stations.find(station => station.station_id === this.selectedStationCode);
 
-    console.log(this.selectedPollutant);
-
     if (this.selectedPollutant.methode_mesure) {
       if (this.selectedPollutant.methode_mesure === 'automatique') {
         this.pollutantInfo = this.stationInfo.polluants.find(pollutant => pollutant.polluant_id === this.selectedPollutant.polluant_id);

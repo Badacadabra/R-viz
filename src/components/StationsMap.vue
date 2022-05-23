@@ -83,19 +83,19 @@ export default defineComponent({
     },
     addStations(): void {
       let firstIcon = L.icon({
-        iconUrl: '/assets/img/station-fixe-active.png',
+        iconUrl: '/app/assets/img/station-fixe-active.png',
         iconSize: [36, 36],
         iconAnchor: [18, 18]
       });
 
       let secondIcon = L.icon({
-        iconUrl: '/assets/img/station-temporaire-active.png',
+        iconUrl: '/app/assets/img/station-temporaire-active.png',
         iconSize: [36, 36],
         iconAnchor: [18, 18]
       });
 
       let thirdIcon = L.icon({
-        iconUrl: '/assets/img/station-inactive.png',
+        iconUrl: '/app/assets/img/station-inactive.png',
         iconSize: [36, 36],
         iconAnchor: [18, 18]
       });

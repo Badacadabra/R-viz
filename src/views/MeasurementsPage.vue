@@ -41,15 +41,15 @@
         <ion-content color="light" fullscreen>
           <div id="legend">
             <figure :class="{active: fixedActive, menu: true}" @click="displayStationsOnMap('fixed')">
-              <img src="/assets/img/station-fixe-active.png" alt="Fixes">
+              <img src="/app/assets/img/station-fixe-active.png" alt="Fixes">
               <figcaption>Fixes</figcaption>
             </figure>
             <figure :class="{active: temporaryActive, menu: true}" @click="displayStationsOnMap('temporary')">
-              <img src="/assets/img/station-temporaire-active.png" alt="Temporaires">
+              <img src="/app/assets/img/station-temporaire-active.png" alt="Temporaires">
               <figcaption>Temporaires</figcaption>
             </figure>
             <figure :class="{active: closedActive, menu: true}" @click="displayStationsOnMap('closed')">
-              <img src="/assets/img/station-inactive.png" alt="Inactives">
+              <img src="/app/assets/img/station-inactive.png" alt="Inactives">
               <figcaption>Inactives</figcaption>
             </figure>
           </div>
