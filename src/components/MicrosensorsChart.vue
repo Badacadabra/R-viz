@@ -9,6 +9,8 @@ import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import am5locales_fr_FR from '@amcharts/amcharts5/locales/fr_FR';
+import * as am5plugins_exporting from "@amcharts/amcharts5/plugins/exporting";
+import { format } from 'date-fns';
 
 interface myData {
   apiArr: any;
@@ -159,6 +161,38 @@ export default defineComponent({
       // https://www.amcharts.com/docs/v5/concepts/animations/
       concentrations.appear(1000);
       chart.appear(1000, 100);
+
+
+      // Set exporting
+      // https://www.amcharts.com/docs/v5/concepts/exporting/
+      let dataExport = [];
+
+      for (let measurement of this.apiArr) {
+        if (measurement.variable === this.selectedVariableName) {
+          dataExport.push({
+            date_heure: format(new Date(measurement.time), 'dd/MM/yyyy HH:mm'),
+            valeur: measurement.valeur,
+            unite: measurement.unite,
+            site: measurement.nom_site,
+            variable: measurement.variable
+          });
+        }
+      }
+
+      am5plugins_exporting.Exporting.new(root, {
+        menu: am5plugins_exporting.ExportingMenu.new(root, {}),
+        filePrefix: `${this.apiArr[0].nom_site}_${this.apiArr[0].variable}`,
+        dataSource: dataExport,
+        jpgOptions: {
+          disabled: true
+        },
+        pdfOptions: {
+          disabled: true
+        },
+        pdfdataOptions: {
+          disabled: true
+        }
+      });
 
     } else {
       this.noMeasurementsMessage = true;

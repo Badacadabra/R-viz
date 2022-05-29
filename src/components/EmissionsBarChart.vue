@@ -8,11 +8,13 @@ import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import am5locales_fr_FR from "@amcharts/amcharts5/locales/fr_FR";
+import * as am5plugins_exporting from "@amcharts/amcharts5/plugins/exporting";
 
 interface myData {
   apiArr: any;
   chartVariables: any;
   selectedPollutant: string;
+  selectedEpci: string;
 }
 
 export default defineComponent({
@@ -20,13 +22,15 @@ export default defineComponent({
   props: {
     api: Array,
     variables: Object,
-    pollutant: String
+    pollutant: String,
+    epci: String
   },
   data(): myData {
     return {
       apiArr: this.api,
       chartVariables: this.variables,
-      selectedPollutant: this.pollutant
+      selectedPollutant: this.pollutant,
+      selectedEpci: this.epci
     };
   },
   mounted(): void {
@@ -132,6 +136,36 @@ export default defineComponent({
     // https://www.amcharts.com/docs/v5/concepts/animations/
     series.appear(1000);
     chart.appear(1000, 100);
+
+
+    // Set exporting
+    // https://www.amcharts.com/docs/v5/concepts/exporting/
+    let dataExport = [];
+
+    for (let el of this.apiArr) {
+      dataExport.push({
+        annee: el.x,
+        valeur: el.y,
+        unite: this.chartVariables[pollutantKey].unite,
+        polluant: this.selectedPollutant,
+        epci: this.selectedEpci
+      });
+    }
+
+    am5plugins_exporting.Exporting.new(root, {
+      menu: am5plugins_exporting.ExportingMenu.new(root, {}),
+      filePrefix: `histogramme_emissions_${this.selectedPollutant}_${this.selectedEpci}`,
+      dataSource: dataExport,
+      jpgOptions: {
+        disabled: true
+      },
+      pdfOptions: {
+        disabled: true
+      },
+      pdfdataOptions: {
+        disabled: true
+      }
+    });
   }
 });
 </script>

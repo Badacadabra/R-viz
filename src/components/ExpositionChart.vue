@@ -8,11 +8,15 @@ import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import am5locales_fr_FR from "@amcharts/amcharts5/locales/fr_FR";
+import * as am5plugins_exporting from "@amcharts/amcharts5/plugins/exporting";
 
 interface myData {
   apiObj: any;
   selectedPollutant: string;
   selectedThreshold: string;
+  selectedScope: string;
+  selectedCity: any;
+  selectedDepartment: string;
 }
 
 export default defineComponent({
@@ -20,13 +24,19 @@ export default defineComponent({
   props: {
     api: Object,
     pollutant: String,
-    threshold: String
+    threshold: String,
+    scope: String,
+    city: Object,
+    department: String
   },
   data(): myData {
     return {
       apiObj: this.api,
       selectedPollutant: this.pollutant,
-      selectedThreshold: this.threshold
+      selectedThreshold: this.threshold,
+      selectedScope: this.scope,
+      selectedCity: this.city,
+      selectedDepartment: this.department
     };
   },
   mounted(): void {
@@ -148,6 +158,42 @@ export default defineComponent({
     chart.appear(1000, 100);
 
     this.$emit('chartReady');
+
+
+    // Set exporting
+    // https://www.amcharts.com/docs/v5/concepts/exporting/
+    let dataExport = [],
+        territory = this.selectedScope === 'city' ? this.selectedCity.code : this.selectedDepartment;
+
+    console.log(this.selectedScope);
+
+    for (let year in values) {
+      if (parseInt(year) > (thisYear - 7) && values[year][this.selectedPollutant]) {
+        dataExport.push({
+          annee: year,
+          valeur: values[year][this.selectedPollutant].exposition_population,
+          unite: 'Nombre d\'habitants',
+          polluant: this.selectedPollutant,
+          seuil: this.selectedThreshold,
+          territoire: territory
+        });
+      }
+    }
+
+    am5plugins_exporting.Exporting.new(root, {
+      menu: am5plugins_exporting.ExportingMenu.new(root, {}),
+      filePrefix: `exposition_${this.selectedPollutant}_${this.selectedThreshold}_${territory}`,
+      dataSource: dataExport,
+      jpgOptions: {
+        disabled: true
+      },
+      pdfOptions: {
+        disabled: true
+      },
+      pdfdataOptions: {
+        disabled: true
+      }
+    });
   }
 });
 </script>

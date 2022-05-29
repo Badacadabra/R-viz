@@ -156,6 +156,8 @@ import * as Vector from 'esri-leaflet-vector';
 import { MarkerClusterGroup } from 'leaflet.markercluster/src';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import { SimpleMapScreenshoter } from 'leaflet-simple-map-screenshoter';
+import { format } from 'date-fns';
 
 interface myData {
   isAlertDisplayed: boolean;
@@ -189,6 +191,7 @@ interface myData {
     remarqueCommentaire: string,
     photoUrl: string
   }>;
+  screenshoter: any;
 }
 
 export default defineComponent({
@@ -225,7 +228,8 @@ export default defineComponent({
       isModalOpened: false,
       index: 1,
       selectedDeclarationId: 0,
-      details: []
+      details: [],
+      screenshoter: null
     }
   },
   watch: {
@@ -271,13 +275,20 @@ export default defineComponent({
       });
 
       // Map panes
+      this.map.createPane('export');
+      this.map.getPane('export').style.zIndex = '0';
+
       this.map.createPane('background');
-      this.map.getPane('background').style.zIndex = "100";
+      this.map.getPane('background').style.zIndex = '100';
 
       this.map.createPane('labels');
-      this.map.getPane('labels').style.zIndex = "200";
+      this.map.getPane('labels').style.zIndex = '200';
 
       // Light Gray Canvas Base + Reference (Esri)
+      L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        pane: 'export'
+      }).addTo(this.map);
+
       Vector.vectorTileLayer('291da5eab3a0412593b66d384379f89f', {
         pane: 'background'
       }).addTo(this.map);
@@ -307,6 +318,9 @@ export default defineComponent({
         const legend: HTMLElement = document.querySelector('.counter');
         legend.style.display = 'block';
       });
+
+      // Export
+      this.screenshoter = new SimpleMapScreenshoter().addTo(this.map);
 
       // Data
       this.addReportsToMap('Odeur');
@@ -455,6 +469,9 @@ export default defineComponent({
         });
 
       this.map.addLayer(this.clusters);
+
+      // Export
+      this.screenshoter.options.screenName = `nuisances_${format(new Date(this.startDate), 'dd-MM-yyyy')}_${format(new Date(this.endDate), 'dd-MM-yyyy')}`;
     },
     updateMap(limit: string, date: string): void {
       if (limit === 'start') {

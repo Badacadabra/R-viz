@@ -8,19 +8,29 @@ import * as am5 from '@amcharts/amcharts5';
 import * as am5percent from '@amcharts/amcharts5/percent';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import am5locales_fr_FR from "@amcharts/amcharts5/locales/fr_FR";
+import * as am5plugins_exporting from "@amcharts/amcharts5/plugins/exporting";
 
 interface myData {
   apiArr: any;
+  chartVariables: any;
+  selectedPollutant: string;
+  selectedEpci: string;
 }
 
 export default defineComponent({
   name: 'EmissionsDonutChart',
   props: {
-    api: Array
+    api: Array,
+    variables: Object,
+    pollutant: String,
+    epci: String
   },
   data(): myData {
     return {
-      apiArr: this.api
+      apiArr: this.api,
+      chartVariables: this.variables,
+      selectedPollutant: this.pollutant,
+      selectedEpci: this.epci
     };
   },
   mounted(): void {
@@ -108,6 +118,37 @@ export default defineComponent({
     // Play initial series animation
     // https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series
     series.appear(1000, 100);
+
+
+    // Set exporting
+    // https://www.amcharts.com/docs/v5/concepts/exporting/
+    let dataExport = [],
+        pollutantKey = this.selectedPollutant === 'pm25' ? 'pm2.5' : this.selectedPollutant;
+
+    for (let sector of this.apiArr) {
+      dataExport.push({
+        secteur: sector.name,
+        valeur: sector.y,
+        unite: this.chartVariables[pollutantKey].unite,
+        polluant: this.selectedPollutant,
+        epci: this.selectedEpci
+      });
+    }
+
+    am5plugins_exporting.Exporting.new(root, {
+      menu: am5plugins_exporting.ExportingMenu.new(root, {}),
+      filePrefix: `camembert_emissions_${this.selectedPollutant}_${this.selectedEpci}`,
+      dataSource: dataExport,
+      jpgOptions: {
+        disabled: true
+      },
+      pdfOptions: {
+        disabled: true
+      },
+      pdfdataOptions: {
+        disabled: true
+      }
+    });
   }
 });
 </script>

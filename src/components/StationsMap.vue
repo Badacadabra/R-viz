@@ -4,18 +4,22 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { getPlatforms } from '@ionic/vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as Vector from 'esri-leaflet-vector';
+import { SimpleMapScreenshoter } from 'leaflet-simple-map-screenshoter';
 
 interface myData {
   map: any;
   center: [number, number];
   numberOfStations: number;
   allStations: any;
-  stationInfo: any;
+  stationInfo: string;
+  stationInfoPublicName: string;
   markerGroup: any;
   counter: any;
+  screenshoter: any;
 }
 
 export default defineComponent({
@@ -31,8 +35,10 @@ export default defineComponent({
       numberOfStations: 0,
       allStations: this.stations,
       stationInfo: this.info,
+      stationInfoPublicName: '',
       markerGroup: null,
-      counter: null
+      counter: null,
+      screenshoter: null
     }
   },
   watch: {
@@ -46,9 +52,16 @@ export default defineComponent({
   },
   methods: {
     setupLeafletMap(): void {
+      // Handle different platforms
+      let zoomControl = false;
+
+      if (getPlatforms().includes('desktop') && window.innerWidth >= 1500) {
+        zoomControl = true;
+      }
+
       // Init map
       this.map = L.map('stations-map', {
-        zoomControl: false,
+        zoomControl,
         minZoom: 7,
         maxZoom: 17,
         attributionControl: false,
@@ -63,13 +76,20 @@ export default defineComponent({
       });
 
       // Map panes
+      this.map.createPane('export');
+      this.map.getPane('export').style.zIndex = '0';
+
       this.map.createPane('background');
-      this.map.getPane('background').style.zIndex = "100";
+      this.map.getPane('background').style.zIndex = '100';
 
       this.map.createPane('labels');
-      this.map.getPane('labels').style.zIndex = "200";
+      this.map.getPane('labels').style.zIndex = '200';
 
       // Light Gray Canvas Base + Reference (Esri)
+      L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        pane: 'export'
+      }).addTo(this.map);
+
       Vector.vectorTileLayer('291da5eab3a0412593b66d384379f89f', {
         pane: 'background'
       }).addTo(this.map);
@@ -77,6 +97,9 @@ export default defineComponent({
       Vector.vectorTileLayer('1768e8369a214dfab4e2167d5c5f2454', {
          pane: 'labels'
       }).addTo(this.map);
+
+      // Export
+      this.screenshoter = new SimpleMapScreenshoter().addTo(this.map);
 
       // Data
       this.addStations();
@@ -115,10 +138,13 @@ export default defineComponent({
 
         if (this.stationInfo === 'fixed' && icon === firstIcon) {
           this.addMarkers(station, icon);
+          this.stationInfoPublicName = 'fixes';
         } else if (this.stationInfo === 'temporary' && icon === secondIcon) {
           this.addMarkers(station, icon);
+          this.stationInfoPublicName = 'temporaires';
         } else if (this.stationInfo === 'closed' && icon === thirdIcon) {
           this.addMarkers(station, icon);
+          this.stationInfoPublicName = 'inactives';
         }
       }
 
@@ -136,6 +162,9 @@ export default defineComponent({
       };
 
       this.counter.addTo(this.map);
+
+      // Export
+      this.screenshoter.options.screenName = `stations_${this.stationInfoPublicName}`;
     },
     addMarkers(station: any, icon: any): void {
       let marker = L.marker([station.latitude, station.longitude], { icon }).addTo(this.markerGroup);

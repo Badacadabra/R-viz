@@ -8,6 +8,7 @@ import { getPlatforms } from '@ionic/vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as Vector from 'esri-leaflet-vector';
+import { SimpleMapScreenshoter } from 'leaflet-simple-map-screenshoter';
 
 interface myData {
   map: any;
@@ -17,6 +18,7 @@ interface myData {
   choroplethData: any;
   currentLayer: any;
   legend: any;
+  screenshoter: any;
 }
 
 export default defineComponent({
@@ -34,7 +36,8 @@ export default defineComponent({
       selectedPollutant: this.pollutant,
       choroplethData: this.geojson,
       currentLayer: null,
-      legend: null
+      legend: null,
+      screenshoter: null
     }
   },
   watch: {
@@ -76,19 +79,31 @@ export default defineComponent({
       });
 
       // Map panes
+      this.map.createPane('export');
+      this.map.getPane('export').style.zIndex = '0';
+
       this.map.createPane('background');
-      this.map.getPane('background').style.zIndex = "100";
+      this.map.getPane('background').style.zIndex = '100';
 
       this.map.createPane('labels');
-      this.map.getPane('labels').style.zIndex = "200";
+      this.map.getPane('labels').style.zIndex = '200';
 
       // Light Gray Canvas Base + Reference (Esri)
+      L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        pane: 'export'
+      }).addTo(this.map);
+
       Vector.vectorTileLayer('291da5eab3a0412593b66d384379f89f', {
         pane: 'background'
       }).addTo(this.map);
 
       Vector.vectorTileLayer('1768e8369a214dfab4e2167d5c5f2454', {
          pane: 'labels'
+      }).addTo(this.map);
+
+      // Export
+      this.screenshoter = new SimpleMapScreenshoter({
+        hideElementsWithSelectors: ['.leaflet-control-zoom', '.leaflet-control-simpleMapScreenshoter']
       }).addTo(this.map);
 
       // Data
@@ -150,6 +165,9 @@ export default defineComponent({
           });
         }
       }).addTo(this.map);
+
+      // Export
+      this.screenshoter.options.screenName = `emissions_${this.selectedPollutant}`;
     },
     style(feature: any): any {
       return {

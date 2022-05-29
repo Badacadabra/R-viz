@@ -9,6 +9,8 @@ import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import am5locales_fr_FR from '@amcharts/amcharts5/locales/fr_FR';
+import * as am5plugins_exporting from "@amcharts/amcharts5/plugins/exporting";
+import { format } from 'date-fns';
 
 interface myData {
   apiObj: any;
@@ -61,6 +63,7 @@ export default defineComponent({
       // https://www.amcharts.com/docs/v5/getting-started/#Root_element
       let root = am5.Root.new(this.$refs.lineChart as HTMLElement);
       root.locale = am5locales_fr_FR;
+
 
       // Set themes
       // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -288,6 +291,49 @@ export default defineComponent({
       ref.appear(1000);
       chart.appear(1000, 100);
 
+
+      // Set exporting
+      // https://www.amcharts.com/docs/v5/concepts/exporting/
+      let dataExport = [];
+
+      for (let measurement of this.pollutantInfo.mesures) {
+        let txt = '';
+
+        if (measurement.validation === false) {
+          txt = 'brut';
+        }
+
+        if (measurement.validation === true) {
+          txt = 'validé';
+        }
+
+        dataExport.push({
+          date_heure: format(new Date(measurement.date_debut), 'dd/MM/yyyy HH:mm'),
+          concentration: measurement.valeur,
+          reference_min: (measurement.courbes_references.length) ? measurement.courbes_references[0].valeur_basse : null,
+          reference_max: (measurement.courbes_references.length) ? measurement.courbes_references[0].valeur_haute : null,
+          unite: this.pollutantInfo.unite,
+          validation: txt,
+          station: this.stationInfo.nom,
+          polluant: this.pollutantInfo.label
+        });
+      }
+
+      am5plugins_exporting.Exporting.new(root, {
+        menu: am5plugins_exporting.ExportingMenu.new(root, {}),
+        filePrefix: `${this.stationInfo.station_id}_${this.pollutantInfo.nom}`,
+        dataSource: dataExport,
+        jpgOptions: {
+          disabled: true
+        },
+        pdfOptions: {
+          disabled: true
+        },
+        pdfdataOptions: {
+          disabled: true
+        }
+      });
+
     } else if (this.pollutantInfo && (this.selectedPollutant.methode_mesure === 'manuelle' || this.pollutantInfo.polluant_id.includes('_diff')) && this.pollutantInfo.mesures.length > 0) {
       // Create root element
       // https://www.amcharts.com/docs/v5/getting-started/#Root_element
@@ -430,6 +476,37 @@ export default defineComponent({
       // https://www.amcharts.com/docs/v5/concepts/animations/
       series.appear(1000);
       chart.appear(1000, 100);
+
+
+      // Set exporting
+      // https://www.amcharts.com/docs/v5/concepts/exporting/
+      let dataExport = [];
+
+      for (let measurement of this.pollutantInfo.mesures) {
+        dataExport.push({
+          date_debut: format(new Date(measurement.date_debut), 'dd/MM/yyyy HH:mm'),
+          date_fin: format(new Date(measurement.date_fin), 'dd/MM/yyyy HH:mm'),
+          concentration: measurement.valeur,
+          unite: this.pollutantInfo.unite,
+          station: this.stationInfo.nom,
+          polluant: this.pollutantInfo.label
+        });
+      }
+
+      am5plugins_exporting.Exporting.new(root, {
+        menu: am5plugins_exporting.ExportingMenu.new(root, {}),
+        filePrefix: `${this.stationInfo.station_id}_${this.pollutantInfo.nom}`,
+        dataSource: dataExport,
+        jpgOptions: {
+          disabled: true
+        },
+        pdfOptions: {
+          disabled: true
+        },
+        pdfdataOptions: {
+          disabled: true
+        }
+      });
 
     } else {
       this.noMeasurementsMessage = true;

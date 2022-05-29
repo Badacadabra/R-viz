@@ -4,9 +4,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { getPlatforms } from '@ionic/vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as Vector from 'esri-leaflet-vector';
+import { SimpleMapScreenshoter } from 'leaflet-simple-map-screenshoter';
 
 interface myData {
   map: any;
@@ -14,8 +16,10 @@ interface myData {
   numberOfMicrosensors: number;
   allMicrosensors: any;
   microsensorCampaignId: number;
+  campaignName: string;
   markerGroup: any;
   counter: any;
+  screenshoter: any;
 }
 
 export default defineComponent({
@@ -31,8 +35,10 @@ export default defineComponent({
       numberOfMicrosensors: 0,
       allMicrosensors: this.microsensors,
       microsensorCampaignId: this.campaign,
+      campaignName: '',
       markerGroup: null,
-      counter: null
+      counter: null,
+      screenshoter: null
     }
   },
   watch: {
@@ -53,9 +59,16 @@ export default defineComponent({
   },
   methods: {
     setupLeafletMap(): void {
+      // Handle different platforms
+      let zoomControl = false;
+
+      if (getPlatforms().includes('desktop') && window.innerWidth >= 1500) {
+        zoomControl = true;
+      }
+
       // Init map
       this.map = L.map('microsensors-map', {
-        zoomControl: false,
+        zoomControl,
         minZoom: 7,
         maxZoom: 17,
         attributionControl: false,
@@ -70,6 +83,9 @@ export default defineComponent({
       });
 
       // Map panes
+      this.map.createPane('export');
+      this.map.getPane('export').style.zIndex = '0';
+
       this.map.createPane('background');
       this.map.getPane('background').style.zIndex = '100';
 
@@ -77,6 +93,10 @@ export default defineComponent({
       this.map.getPane('labels').style.zIndex = '200';
 
       // Light Gray Canvas Base + Reference (Esri)
+      L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        pane: 'export'
+      }).addTo(this.map);
+
       Vector.vectorTileLayer('291da5eab3a0412593b66d384379f89f', {
         pane: 'background'
       }).addTo(this.map);
@@ -84,6 +104,9 @@ export default defineComponent({
       Vector.vectorTileLayer('1768e8369a214dfab4e2167d5c5f2454', {
          pane: 'labels'
       }).addTo(this.map);
+
+      // Export
+      this.screenshoter = new SimpleMapScreenshoter().addTo(this.map);
 
       // Data
       this.addMicrosensors();
@@ -106,14 +129,16 @@ export default defineComponent({
       for (let microsensor of this.allMicrosensors) {
         let icon = null;
 
-        if (microsensor.id_campagne === 12 && this.microsensorCampaignId === 12) { // DIAMS
+        if (microsensor.id_campagne === 12 && this.microsensorCampaignId === 12) {
           icon = firstIcon;
           this.addMarkers(microsensor, icon);
+          this.campaignName = 'DIAMS';
         }
 
-        if (microsensor.id_campagne === 5 && this.microsensorCampaignId === 5) { // Nature4CityLife
+        if (microsensor.id_campagne === 5 && this.microsensorCampaignId === 5) {
           icon = secondIcon;
           this.addMarkers(microsensor, icon);
+          this.campaignName = 'Nature4CityLife';
         }
       }
 
@@ -131,6 +156,9 @@ export default defineComponent({
       };
 
       this.counter.addTo(this.map);
+
+      // Export
+      this.screenshoter.options.screenName = `microcapteurs_${this.campaignName}`;
     },
     addMarkers(microsensor: any, icon: any): void {
       let marker = L.marker([microsensor.lat, microsensor.lon], { icon }).addTo(this.markerGroup);

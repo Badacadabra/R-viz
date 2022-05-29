@@ -8,6 +8,8 @@ import { getPlatforms } from '@ionic/vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as Vector from 'esri-leaflet-vector';
+import { SimpleMapScreenshoter } from 'leaflet-simple-map-screenshoter';
+import { format } from 'date-fns';
 
 interface myData {
   map: any;
@@ -15,6 +17,7 @@ interface myData {
   currentLayer: any;
   currentDate: string;
   selectedPollutantId: string;
+  screenshoter: any;
 }
 
 export default defineComponent({
@@ -28,7 +31,8 @@ export default defineComponent({
       center: [43.938, 6.022], // Entrevennes
       currentLayer: null,
       currentDate: this.date,
-      selectedPollutantId: 'multi'
+      selectedPollutantId: 'multi',
+      screenshoter: null
     }
   },
   watch: {
@@ -69,13 +73,20 @@ export default defineComponent({
       });
 
       // Map panes
+      this.map.createPane('export');
+      this.map.getPane('export').style.zIndex = '0';
+
       this.map.createPane('background');
-      this.map.getPane('background').style.zIndex = "100";
+      this.map.getPane('background').style.zIndex = '100';
 
       this.map.createPane('labels');
-      this.map.getPane('labels').style.zIndex = "200";
+      this.map.getPane('labels').style.zIndex = '200';
 
       // Light Gray Canvas Base + Reference (Esri)
+      L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        pane: 'export'
+      }).addTo(this.map);
+
       Vector.vectorTileLayer('291da5eab3a0412593b66d384379f89f', {
         pane: 'background'
       }).addTo(this.map);
@@ -122,6 +133,9 @@ export default defineComponent({
         this.$emit('clickOnMap', e.latlng.lat, e.latlng.lng);
       });
 
+      // Export
+      this.screenshoter = new SimpleMapScreenshoter().addTo(this.map);
+
       // WMS/WMTS
       this.addRaster();
     },
@@ -135,6 +149,9 @@ export default defineComponent({
         minZoom: 7,
         opacity: 0.7
       }).addTo(this.map);
+
+      // Export
+      this.screenshoter.options.screenName = `previsions-detaillees_${format(new Date(this.currentDate), 'dd-MM-yyyy')}_${this.selectedPollutantId}`;
     }
   },
   mounted() {

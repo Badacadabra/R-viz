@@ -48,10 +48,12 @@
               <img src="/app/assets/img/station-temporaire-active.png" alt="Temporaires">
               <figcaption>Temporaires</figcaption>
             </figure>
+            <!--
             <figure :class="{active: closedActive, menu: true}" @click="displayStationsOnMap('closed')">
               <img src="/app/assets/img/station-inactive.png" alt="Inactives">
               <figcaption>Inactives</figcaption>
             </figure>
+            -->
           </div>
           <StationsMap :stations="stationsFromAccessByStation" :info="stationInfo" v-if="stationsFromAccessByStation.length > 0" />
           <ion-accordion-group>

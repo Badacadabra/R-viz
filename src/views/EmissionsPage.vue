@@ -82,11 +82,11 @@
               </ion-item>
             </ion-card-content>
           </ion-card>
-          <EmissionsDonutChart :api="distributionBySectors" :key="key" />
+          <EmissionsDonutChart :api="distributionBySectors" :variables="variables" :pollutant="selectedPollutant" :epci="selectedEpciCode" :key="key" />
           <ion-text>
             <h2>Évolution pluriannuelle</h2>
           </ion-text>
-          <EmissionsBarChart :api="totalEmissions" :variables="variables" :pollutant="selectedPollutant" :key="key" />
+          <EmissionsBarChart :api="totalEmissions" :variables="variables" :pollutant="selectedPollutant" :epci="selectedEpciCode" :key="key" />
         </ion-content>
       </ion-modal>
     </ion-content>

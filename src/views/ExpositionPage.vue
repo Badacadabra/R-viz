@@ -70,7 +70,7 @@
       <ion-item id="previz" v-if="!expositionApiData">
         <ion-icon :icon="barChart"></ion-icon>
       </ion-item>
-      <ExpositionChart :api="expositionApiData" :pollutant="selectedPollutant" :threshold="selectedThreshold" v-if="expositionApiData && selectedPollutant && selectedThreshold" :key="key" @chart-ready="chartIsReady()" />
+      <ExpositionChart :api="expositionApiData" :pollutant="selectedPollutant" :threshold="selectedThreshold" :scope="scope" :city="selectedCity" :department="selectedDepartment" v-if="expositionApiData && selectedPollutant && selectedThreshold && scope" :key="key" @chart-ready="chartIsReady()" />
     </ion-content>
   </ion-page>
 </template>

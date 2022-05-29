@@ -8,6 +8,7 @@ import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import am5locales_fr_FR from '@amcharts/amcharts5/locales/fr_FR';
+import * as am5plugins_exporting from "@amcharts/amcharts5/plugins/exporting";
 
 interface myData {
   apiObj: any;
@@ -81,7 +82,7 @@ export default defineComponent({
 
     for (let i = (new Date().getFullYear() - 4); i < new Date().getFullYear(); i++) {
       data.push({
-        year: i + "",
+        year: i + '',
         o3: (pollutants.O3 !== undefined && pollutants.O3[i] !== undefined) ? pollutants.O3[i].nbre_episodes : 0,
         pm10: (pollutants.PM10 !== undefined && pollutants.PM10[i] !== undefined) ? pollutants.PM10[i].nbre_episodes : 0
       });
@@ -146,7 +147,7 @@ export default defineComponent({
         return am5.Bullet.new(root, {
           locationY: 0,
           sprite: am5.Label.new(root, {
-            text: "{valueY}",
+            text: '{valueY}',
             fill: root.interfaceColors.get('alternativeText'),
             centerY: 0,
             centerX: am5.p50,
@@ -165,6 +166,36 @@ export default defineComponent({
     // Make stuff animate on load
     // https://www.amcharts.com/docs/v5/concepts/animations/
     chart.appear(1000, 100);
+
+
+    // Set exporting
+    // https://www.amcharts.com/docs/v5/concepts/exporting/
+    let dataExport = [];
+
+    for (let i = (new Date().getFullYear() - 4); i < new Date().getFullYear(); i++) {
+      dataExport.push({
+        annee: i + '',
+        nb_episodes_o3: (pollutants.O3 !== undefined && pollutants.O3[i] !== undefined) ? pollutants.O3[i].nbre_episodes : 0,
+        nb_episodes_pm10: (pollutants.PM10 !== undefined && pollutants.PM10[i] !== undefined) ? pollutants.PM10[i].nbre_episodes : 0,
+        unite: 'Nombre de jours',
+        departement: this.departmentCode
+      });
+    }
+
+    am5plugins_exporting.Exporting.new(root, {
+      menu: am5plugins_exporting.ExportingMenu.new(root, {}),
+      filePrefix: `episodes_o3_pm10_${this.departmentCode}`,
+      dataSource: dataExport,
+      jpgOptions: {
+        disabled: true
+      },
+      pdfOptions: {
+        disabled: true
+      },
+      pdfdataOptions: {
+        disabled: true
+      }
+    });
   }
 });
 </script>
