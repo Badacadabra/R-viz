@@ -85,7 +85,7 @@
       <swiper :modules="modules" :pagination="true" :slides-per-view="1.5">
         <swiper-slide>
           <ion-card class="services" @click="showWebPage('https://api.atmosud.org')">
-            <ion-img src="/assets/img/api.png"></ion-img>
+            <ion-img src="/app/assets/img/api.png"></ion-img>
             <ion-card-header>
               <ion-card-title>APIs</ion-card-title>
             </ion-card-header>
@@ -96,7 +96,7 @@
         </swiper-slide>
         <swiper-slide>
           <ion-card class="services" @click="showWebPage('https://opendata.atmosud.org')">
-            <ion-img src="/assets/img/open-data.png"></ion-img>
+            <ion-img src="/app/assets/img/open-data.png"></ion-img>
             <ion-card-header>
               <ion-card-title>Open Data</ion-card-title>
             </ion-card-header>
@@ -107,7 +107,7 @@
         </swiper-slide>
         <swiper-slide>
           <ion-card class="services" @click="showWebPage('https://cigale.atmosud.org/')">
-            <ion-img src="/assets/img/cigale.png"></ion-img>
+            <ion-img src="/app/assets/img/cigale.png"></ion-img>
             <ion-card-header>
               <ion-card-title>CIGALE</ion-card-title>
             </ion-card-header>
@@ -118,7 +118,7 @@
         </swiper-slide>
         <swiper-slide>
           <ion-card class="services" @click="showWebPage('https://www.signalair.eu/fr/')">
-            <ion-img src="/assets/img/signalair.png"></ion-img>
+            <ion-img src="/app/assets/img/signalair.png"></ion-img>
             <ion-card-header>
               <ion-card-title>SignalAir</ion-card-title>
             </ion-card-header>
