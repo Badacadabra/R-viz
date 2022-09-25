@@ -97,9 +97,18 @@ export default defineComponent({
          pane: 'labels'
       }).addTo(this.map);
 
-      // Map menu
+      // Export
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter = new SimpleMapScreenshoter({
+          hideElementsWithSelectors: ['.leaflet-control-zoom', '.leaflet-control-simpleMapScreenshoter', '.menu', '.year']
+        }).addTo(this.map);
+      }
+
+      // Map controls
       const ctrl = L.control as any,
-            menu = ctrl({ position: 'topright' });
+            menu = ctrl({ position: 'topright' }),
+            mainLegend = ctrl({ position: 'topleft' }),
+            watermark = ctrl({ position: 'bottomright' });
 
       menu.onAdd = () => {
         let div = L.DomUtil.create('div', 'menu');
@@ -113,10 +122,32 @@ export default defineComponent({
         return div;
       };
 
+      mainLegend.onAdd = () => {
+        let div = L.DomUtil.create('div', 'mainLegend');
+
+        div.innerHTML += '<div></div>';
+        div.innerHTML += `<img src="https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=15&LAYER=mod_sudpaca_${this.selectedYear}:mod_sudpaca_${this.selectedYear}_${this.selectedPollutantId}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true" alt="Légende">`;
+
+        return div;
+      };
+
+      watermark.onAdd = () => {
+        let div = L.DomUtil.create('div', 'watermark');
+
+        div.innerHTML += '<img src="/app/assets/img/logo-atmosud.png" alt="AtmoSud" style="display:none;">';
+
+        return div;
+      };
+
       menu.addTo(this.map);
+      mainLegend.addTo(this.map);
+      watermark.addTo(this.map);
 
       // Event listeners
-      const buttons = this.$refs.annualMap.querySelectorAll('.pollutantSelector');
+      const buttons = this.$refs.annualMap.querySelectorAll('.pollutantSelector'),
+            mainLegendUnit = this.$refs.annualMap.querySelector('.mainLegend div'),
+            mainLegendImg = this.$refs.annualMap.querySelector('.mainLegend img'),
+            watermarkImg = this.$refs.annualMap.querySelector('.watermark img');
 
       for (let button of buttons) {
         button.addEventListener('click', (e) => {
@@ -128,11 +159,26 @@ export default defineComponent({
           this.selectedPollutantId = (e.target as HTMLElement).id;
           this.map.removeLayer(this.currentLayer);
           this.addRaster(false);
+
+          if (this.selectedPollutantId === 'isa_an') {
+            mainLegendUnit.textContent = '';
+          } else {
+            mainLegendUnit.textContent = 'µg/m³';
+          }
+
+          mainLegendImg.src = `https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=15&LAYER=mod_sudpaca_${this.selectedYear}:mod_sudpaca_${this.selectedYear}_${this.selectedPollutantId}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true`;
         });
       }
 
-      // Export
-      this.screenshoter = new SimpleMapScreenshoter().addTo(this.map);
+      this.map.on('simpleMapScreenshoter.click', () => {
+        this.map.dragging.disable();
+        watermarkImg.style.display = 'block';
+      });
+
+      this.map.on('simpleMapScreenshoter.done', () => {
+        this.map.dragging.enable();
+        watermarkImg.style.display = 'none';
+      });
 
       // WMS/WMTS
       this.addRaster(true);
@@ -167,7 +213,9 @@ export default defineComponent({
       }).addTo(this.map);
 
       // Export
-      this.screenshoter.options.screenName = `carte-annuelle_${this.selectedYear}_${this.selectedPollutantId}`;
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter.options.screenName = `carte-annuelle_${this.selectedYear}_${this.selectedPollutantId}`;
+      }
     }
   },
   mounted() {
@@ -212,5 +260,15 @@ export default defineComponent({
 
 #annual-map .leaflet-right .leaflet-control {
   margin-left: 0;
+}
+
+.mainLegend div {
+  background: rgba(255, 255, 255, 0.9);
+  text-align: center;
+}
+
+.mainLegend img {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 5px;
 }
 </style>

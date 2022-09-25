@@ -1,5 +1,5 @@
 <template>
-  <div id="microsensors-map"></div>
+  <div id="microsensors-map" ref="microsensorsMap"></div>
 </template>
 
 <script lang="ts">
@@ -106,7 +106,36 @@ export default defineComponent({
       }).addTo(this.map);
 
       // Export
-      this.screenshoter = new SimpleMapScreenshoter().addTo(this.map);
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter = new SimpleMapScreenshoter({
+          hideElementsWithSelectors: ['.leaflet-control-zoom', '.leaflet-control-simpleMapScreenshoter']
+        }).addTo(this.map);
+      }
+
+      const ctrl = L.control as any,
+            watermark = ctrl({ position: 'bottomright' });
+
+      watermark.onAdd = () => {
+        let div = L.DomUtil.create('div', 'watermark');
+
+        div.innerHTML += '<img src="/app/assets/img/logo-atmosud.png" alt="AtmoSud" style="display:none;width:150px;">';
+
+        return div;
+      };
+
+      watermark.addTo(this.map);
+
+      const watermarkImg = this.$refs.microsensorsMap.querySelector('.watermark img');
+
+      this.map.on('simpleMapScreenshoter.click', () => {
+        this.map.dragging.disable();
+        watermarkImg.style.display = 'block';
+      });
+
+      this.map.on('simpleMapScreenshoter.done', () => {
+        this.map.dragging.enable();
+        watermarkImg.style.display = 'none';
+      });
 
       // Data
       this.addMicrosensors();
@@ -158,7 +187,9 @@ export default defineComponent({
       this.counter.addTo(this.map);
 
       // Export
-      this.screenshoter.options.screenName = `microcapteurs_${this.campaignName}`;
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter.options.screenName = `microcapteurs_${this.campaignName}`;
+      }
     },
     addMarkers(microsensor: any, icon: any): void {
       let marker = L.marker([microsensor.lat, microsensor.lon], { icon }).addTo(this.markerGroup);

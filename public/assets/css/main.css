@@ -24,3 +24,9 @@ ion-icon {
     --border-radius: 0;
   }
 }
+
+@media (min-width: 993px) {
+  .main-modal::part(content) {
+    height: 750px;
+  }
+}

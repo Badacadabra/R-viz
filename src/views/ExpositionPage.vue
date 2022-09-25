@@ -14,6 +14,10 @@
       <ion-segment :value="scope" v-model="scope">
         <ion-segment-button value="city" layout="icon-start">
           <ion-label>Commune</ion-label>
+          <ion-icon :icon="storefrontOutline"></ion-icon>
+        </ion-segment-button>
+        <ion-segment-button value="epci" layout="icon-start">
+          <ion-label>EPCI</ion-label>
           <ion-icon :icon="businessOutline"></ion-icon>
         </ion-segment-button>
         <ion-segment-button value="department" layout="icon-start">
@@ -33,6 +37,12 @@
           </ion-item>
         </div>
       </ion-list>
+      <ion-item v-if="scope === 'epci'">
+        <ion-label>Nom</ion-label>
+        <ion-select ok-text="OK" cancel-text="Annuler" :value="selectedEpci" v-model="selectedEpci">
+          <ion-select-option v-for="epci in epciList" :key="epci.code_territoire" :value="epci.code_territoire" class="radio-wrap">{{ epci.nom_territoire }}</ion-select-option>
+        </ion-select>
+      </ion-item>
       <ion-item v-if="scope === 'department'">
         <ion-label>Nom</ion-label>
         <ion-select interface="popover" :value="selectedDepartment" v-model="selectedDepartment">
@@ -70,7 +80,7 @@
       <ion-item id="previz" v-if="!expositionApiData">
         <ion-icon :icon="barChart"></ion-icon>
       </ion-item>
-      <ExpositionChart :api="expositionApiData" :pollutant="selectedPollutant" :threshold="selectedThreshold" :scope="scope" :city="selectedCity" :department="selectedDepartment" v-if="expositionApiData && selectedPollutant && selectedThreshold && scope" :key="key" @chart-ready="chartIsReady()" />
+      <ExpositionChart :api="expositionApiData" :pollutant="selectedPollutant" :threshold="selectedThreshold" :scope="scope" :city="selectedCity" :epci="selectedEpci" :department="selectedDepartment" v-if="expositionApiData && selectedPollutant && selectedThreshold && scope" :key="key" @chart-ready="chartIsReady()" />
     </ion-content>
   </ion-page>
 </template>
@@ -78,7 +88,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IonContent, IonPage, IonSegment, IonSegmentButton, IonSearchbar, IonList, IonItem, IonLabel, IonIcon, IonChip, IonSelect, IonSelectOption, IonProgressBar, IonLoading, IonAlert } from '@ionic/vue';
-import { businessOutline, trailSignOutline, locationOutline, barChart } from 'ionicons/icons';
+import { storefrontOutline, businessOutline, trailSignOutline, locationOutline, barChart } from 'ionicons/icons';
 import HeadingBar from '@/components/HeadingBar.vue';
 import ExpositionChart from '@/components/ExpositionChart.vue';
 import axios from 'axios';
@@ -89,7 +99,9 @@ interface myData {
   isDataLoaded: boolean;
   userInput: string;
   selectedCity: any;
+  selectedEpci: string;
   cities: [];
+  epciList: [];
   expositionApiData: any;
   selectedPollutant: string;
   selectedThreshold: string;
@@ -126,7 +138,9 @@ export default defineComponent({
       isDataLoaded: true,
       userInput: '',
       selectedCity: null,
+      selectedEpci: '200054807', // AMP
       cities: [],
+      epciList: [],
       expositionApiData: null,
       selectedPollutant: 'PM10',
       selectedThreshold: 'VL',
@@ -182,6 +196,10 @@ export default defineComponent({
         url = `https://api.atmosud.org/exposition/commune/series_annuelles/${this.selectedCity.code}?format=json`;
       }
 
+      if (this.scope === 'epci') {
+        url = `https://api.atmosud.org/exposition/epci/series_annuelles/${this.selectedEpci}?format=json`;
+      }
+
       if (this.scope === 'department') {
         url = `https://api.atmosud.org/exposition/departement/series_annuelles/${this.selectedDepartment}?format=json`;
       }
@@ -204,6 +222,7 @@ export default defineComponent({
   },
   setup() {
     return {
+      storefrontOutline,
       businessOutline,
       trailSignOutline,
       locationOutline,
@@ -219,6 +238,14 @@ export default defineComponent({
         nom: 'Bouches-du-Rhône'
       }
     };
+
+    axios.get('https://api.atmosud.org/referentiel/territoires?rang=3')
+      .then(response => {
+        this.epciList = response.data.sort((a, b) => a.nom_territoire.localeCompare(b.nom_territoire));
+      })
+      .catch(() => {
+        this.isAlertDisplayed = true;
+      });
   },
   watch: {
     scope() {
@@ -227,6 +254,16 @@ export default defineComponent({
   },
 });
 </script>
+
+<style>
+.radio-wrap.alert-tappable.sc-ion-alert-md {
+  height: 80px;
+}
+
+.alert-radio-label.sc-ion-alert-md {
+  white-space: normal;
+}
+</style>
 
 <style scoped>
 #select-pollutant {

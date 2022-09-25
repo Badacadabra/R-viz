@@ -6,7 +6,7 @@
     :buttons="['OK']"
     @didDismiss="hideAlert()"
   ></ion-alert>
-  <div id="nuisance-map"></div>
+  <div id="nuisance-map" ref="nuisanceMap"></div>
   <ion-modal class="main-modal" :is-open="isModalOpened">
     <ion-header>
       <ion-toolbar color="primary">
@@ -297,6 +297,38 @@ export default defineComponent({
          pane: 'labels'
       }).addTo(this.map);
 
+      // Export
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter = new SimpleMapScreenshoter({
+          hideElementsWithSelectors: ['.leaflet-control-zoom', '.leaflet-control-simpleMapScreenshoter', '.counter']
+        }).addTo(this.map);
+      }
+
+      const ctrl = L.control as any,
+            watermark = ctrl({ position: 'bottomright' });
+
+      watermark.onAdd = () => {
+        let div = L.DomUtil.create('div', 'watermark');
+
+        div.innerHTML += '<img src="/app/assets/img/logo-atmosud.png" alt="AtmoSud" style="display:none;">';
+
+        return div;
+      };
+
+      watermark.addTo(this.map);
+
+      const watermarkImg = this.$refs.nuisanceMap.querySelector('.watermark img');
+
+      this.map.on('simpleMapScreenshoter.click', () => {
+        this.map.dragging.disable();
+        watermarkImg.style.display = 'block';
+      });
+
+      this.map.on('simpleMapScreenshoter.done', () => {
+        this.map.dragging.enable();
+        watermarkImg.style.display = 'none';
+      });
+
       // Clustering
       this.clusters = new MarkerClusterGroup({
         showCoverageOnHover: false,
@@ -318,9 +350,6 @@ export default defineComponent({
         const legend: HTMLElement = document.querySelector('.counter');
         legend.style.display = 'block';
       });
-
-      // Export
-      this.screenshoter = new SimpleMapScreenshoter().addTo(this.map);
 
       // Data
       this.addReportsToMap('Odeur');
@@ -471,7 +500,9 @@ export default defineComponent({
       this.map.addLayer(this.clusters);
 
       // Export
-      this.screenshoter.options.screenName = `nuisances_${format(new Date(this.startDate), 'dd-MM-yyyy')}_${format(new Date(this.endDate), 'dd-MM-yyyy')}`;
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter.options.screenName = `nuisances_${format(new Date(this.startDate), 'dd-MM-yyyy')}_${format(new Date(this.endDate), 'dd-MM-yyyy')}`;
+      }
     },
     updateMap(limit: string, date: string): void {
       if (limit === 'start') {

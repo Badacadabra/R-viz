@@ -26,7 +26,7 @@
         <ion-segment-button value="tomorrow">
           <ion-label>Demain</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="dayAfterTomorrow">
+        <ion-segment-button value="dayAfterTomorrow" v-if="j2isAvailable">
           <ion-label>Après-demain</ion-label>
         </ion-segment-button>
       </ion-segment>
@@ -66,7 +66,7 @@
           <ion-segment-button value="tomorrow">
             <ion-label>Demain</ion-label>
           </ion-segment-button>
-          <ion-segment-button value="dayAfterTomorrow">
+          <ion-segment-button value="dayAfterTomorrow" v-if="j2isAvailable">
             <ion-label>Après-demain</ion-label>
           </ion-segment-button>
         </ion-segment>
@@ -80,7 +80,7 @@
             <ion-badge slot="end" :class="$style[subIndex.styleClass]">{{ subIndex.indexLabel }}</ion-badge>
           </ion-item>
         </ion-list>
-        <HourlyForecastsChart :api="apiPointRouteData" v-if="apiPointRouteData" />
+        <!-- <HourlyForecastsChart :api="apiPointRouteData" v-if="apiPointRouteData" /> -->
       </ion-content>
     </ion-modal>
   </ion-page>
@@ -93,7 +93,7 @@ import { close, locationOutline } from 'ionicons/icons';
 import HeadingBar from '@/components/HeadingBar.vue';
 import ForecastsMap from '@/components/ForecastsMap.vue';
 import GaugeChart from '@/components/GaugeChart.vue';
-import HourlyForecastsChart from '@/components/HourlyForecastsChart.vue';
+// import HourlyForecastsChart from '@/components/HourlyForecastsChart.vue';
 import axios from 'axios';
 import { format, add } from 'date-fns';
 
@@ -105,6 +105,7 @@ interface myData {
   apiPointRouteData: any;
   selectedAddress: any;
   isDataLoaded: boolean;
+  j2isAvailable: boolean;
   key: number;
   day: string;
   currentDate: string;
@@ -145,7 +146,7 @@ export default defineComponent({
     HeadingBar,
     ForecastsMap,
     GaugeChart,
-    HourlyForecastsChart
+    // HourlyForecastsChart
   },
   data(): myData {
     return {
@@ -156,6 +157,7 @@ export default defineComponent({
       apiPointRouteData: null,
       selectedAddress: null,
       isDataLoaded: true,
+      j2isAvailable: false,
       key: 0,
       day: 'today',
       currentDate: '',
@@ -225,7 +227,7 @@ export default defineComponent({
       }
     },
     getRegionalComments(): void {
-      axios.get('https://preprod-api.atmosud.org/siam/v1/accueil')
+      axios.get('https://api.atmosud.org/siam/v1/accueil')
         .then(response => {
           this.regionalComments = response.data.data.commentaires;
         })
@@ -282,10 +284,10 @@ export default defineComponent({
 
       this.getDayAndDate(e);
 
-      axios.get(`https://preprod-api.atmosud.org/siam/v1/point?x=${longitude}&y=${latitude}&date_echeance=${this.currentDate}&prevision_horaire=true`)
+      axios.get(`https://api.atmosud.org/siam/v1/point?x=${longitude}&y=${latitude}&date_echeance=${this.currentDate}&prevision_horaire=true`)
         .then(response => {
           this.apiPointRouteData = response.data;
-          this.indexLevel = response.data.data.legendes.indice_atmo.find(i => i.indice === response.data.data.prevision_journaliere.indice_atmo).qualificatif;
+          this.indexLevel = response.data.data.legendes.indice_atmo.find(i => i.indice === Math.trunc(response.data.data.prevision_journaliere.indice_atmo)).qualificatif;
 
           let arr = [] as any;
 
@@ -299,7 +301,7 @@ export default defineComponent({
             obj.pollutantShortName = pollutant.acronyme;
             obj.unit = pollutant.unite;
 
-            let index = response.data.data.legendes.indice_atmo.find(i => i.indice === subIndex.indice_atmo);
+            let index = response.data.data.legendes.indice_atmo.find(i => i.indice === Math.trunc(subIndex.indice_atmo));
 
             obj.indexLabel = index.qualificatif;
             obj.indexImg = index.picto_url;
@@ -338,6 +340,17 @@ export default defineComponent({
         .catch(() => {
           this.isAlertDisplayed = true;
         });
+    },
+    checkJ2(): void {
+      const dayAfterTomorrow = format(add(new Date(), { days: 2 }), 'yyyy-MM-dd'),
+            url = `https://geoservices.atmosud.org/geoserver/azurjour/wms?service=WMS&version=1.1.0&request=GetMap&layers=azurjour:paca-multi-${dayAfterTomorrow}&styles=&bbox=795487.5,6211312.5,1083487.5,6454512.5&width=768&height=648&srs=EPSG:2154&format=image/png&transparent=true`;
+
+      axios.head(url)
+        .then(response => {
+          if (response.headers['content-type'] === 'image/png') {
+            this.j2isAvailable = true;
+          }
+        });
     }
   },
   setup() {
@@ -349,6 +362,7 @@ export default defineComponent({
   mounted() {
     this.getDayAndDate();
     this.getRegionalComments();
+    this.checkJ2();
   }
 });
 </script>

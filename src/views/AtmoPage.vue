@@ -30,7 +30,7 @@
         <ion-segment-button value="tomorrow">
           <ion-label>Demain</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="dayAfterTomorrow">
+        <ion-segment-button value="dayAfterTomorrow" v-if="j2isAvailable">
           <ion-label>Après-demain</ion-label>
         </ion-segment-button>
       </ion-segment>
@@ -73,7 +73,7 @@
           <ion-segment-button value="tomorrow">
             <ion-label>Demain</ion-label>
           </ion-segment-button>
-          <ion-segment-button value="dayAfterTomorrow">
+          <ion-segment-button value="dayAfterTomorrow" v-if="j2isAvailable">
             <ion-label>Après-demain</ion-label>
           </ion-segment-button>
         </ion-segment>
@@ -123,6 +123,7 @@ interface myData {
   selectedCity: any;
   isDataLoaded: boolean;
   isMapLoaded: boolean;
+  j2isAvailable: boolean;
   key: number;
   day: string;
   currentDate: string;
@@ -180,6 +181,7 @@ export default defineComponent({
       selectedCity: null,
       isDataLoaded: true,
       isMapLoaded: false,
+      j2isAvailable: false,
       key: 0,
       day: 'today',
       currentDate: '',
@@ -249,7 +251,7 @@ export default defineComponent({
       }
     },
     getRegionalComments(): void {
-      axios.get('https://preprod-api.atmosud.org/siam/v1/accueil')
+      axios.get('https://api.atmosud.org/siam/v1/accueil')
         .then(response => {
           this.regionalComments = response.data.data.commentaires;
         })
@@ -279,9 +281,9 @@ export default defineComponent({
       this.isDataLoaded = false;
       this.getDayAndDate(e);
 
-      axios.get(`https://preprod-api.atmosud.org/siam/v1/communes/${this.selectedCity.code}`)
+      axios.get(`https://api.atmosud.org/siam/v1/communes/${this.selectedCity.code}`)
         .then(response => {
-          this.indexLevel = response.data.data.legendes.indice_atmo.find(i => i.indice === response.data.data.indices_atmo[this.currentDate].indice_atmo).qualificatif;
+          this.indexLevel = response.data.data.legendes.indice_atmo.find(i => i.indice === Math.trunc(response.data.data.indices_atmo[this.currentDate].indice_atmo)).qualificatif;
 
           let arr = [] as any;
 
@@ -294,7 +296,7 @@ export default defineComponent({
             obj.pollutantName = pollutant.label;
             obj.pollutantShortName = pollutant.acronyme;
 
-            let index = response.data.data.legendes.indice_atmo.find(i => i.indice === subIndex.indice_atmo);
+            let index = response.data.data.legendes.indice_atmo.find(i => i.indice === Math.trunc(subIndex.indice_atmo));
 
             obj.indexLabel = index.qualificatif;
             obj.indexImg = index.picto_url;
@@ -333,6 +335,17 @@ export default defineComponent({
         .catch(() => {
           this.isAlertDisplayed = true;
         });
+    },
+    checkJ2(): void {
+      const dayAfterTomorrow = format(add(new Date(), { days: 2 }), 'yyyy-MM-dd'),
+            url = 'https://api.atmosud.org/siam/v1/accueil';
+
+      axios.get(url)
+        .then(response => {
+          if (response.data.data.cartes.communes['13055'][dayAfterTomorrow]) {
+            this.j2isAvailable = true;
+          }
+        });
     }
   },
   setup() {
@@ -344,6 +357,7 @@ export default defineComponent({
   mounted() {
     this.getDayAndDate();
     this.getRegionalComments();
+    this.checkJ2();
   }
 });
 </script>

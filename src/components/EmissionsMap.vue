@@ -1,5 +1,5 @@
 <template>
-  <div id="emissions-map"></div>
+  <div id="emissions-map" ref="emissionsMap"></div>
 </template>
 
 <script lang="ts">
@@ -102,9 +102,36 @@ export default defineComponent({
       }).addTo(this.map);
 
       // Export
-      this.screenshoter = new SimpleMapScreenshoter({
-        hideElementsWithSelectors: ['.leaflet-control-zoom', '.leaflet-control-simpleMapScreenshoter']
-      }).addTo(this.map);
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter = new SimpleMapScreenshoter({
+          hideElementsWithSelectors: ['.leaflet-control-zoom', '.leaflet-control-simpleMapScreenshoter']
+        }).addTo(this.map);
+      }
+
+      const ctrl = L.control as any,
+            watermark = ctrl({ position: 'bottomright' });
+
+      watermark.onAdd = () => {
+        let div = L.DomUtil.create('div', 'watermark');
+
+        div.innerHTML += '<img src="/app/assets/img/logo-atmosud.png" alt="AtmoSud" style="display:none;">';
+
+        return div;
+      };
+
+      watermark.addTo(this.map);
+
+      const watermarkImg = this.$refs.emissionsMap.querySelector('.watermark img');
+
+      this.map.on('simpleMapScreenshoter.click', () => {
+        this.map.dragging.disable();
+        watermarkImg.style.display = 'block';
+      });
+
+      this.map.on('simpleMapScreenshoter.done', () => {
+        this.map.dragging.enable();
+        watermarkImg.style.display = 'none';
+      });
 
       // Data
       this.addChoropleth();
@@ -167,7 +194,9 @@ export default defineComponent({
       }).addTo(this.map);
 
       // Export
-      this.screenshoter.options.screenName = `emissions_${this.selectedPollutant}`;
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter.options.screenName = `emissions_${this.selectedPollutant}`;
+      }
     },
     style(feature: any): any {
       return {

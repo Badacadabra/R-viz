@@ -11,19 +11,19 @@ import am5locales_fr_FR from '@amcharts/amcharts5/locales/fr_FR';
 import * as am5plugins_exporting from "@amcharts/amcharts5/plugins/exporting";
 
 interface myData {
-  apiObj: any;
+  apiArr: any;
   departmentCode: string;
 }
 
 export default defineComponent({
   name: 'EpisodesChart',
   props: {
-    api: Object,
+    api: Array,
     dep: String
   },
   data(): myData {
     return {
-      apiObj: this.api,
+      apiArr: this.api,
       departmentCode: this.dep
     };
   },
@@ -78,13 +78,12 @@ export default defineComponent({
 
     // Add data
     let data = [];
-    const pollutants = this.apiObj[this.departmentCode].polluants;
 
-    for (let i = (new Date().getFullYear() - 4); i < new Date().getFullYear(); i++) {
+    for (let obj of this.apiArr) {
       data.push({
-        year: i + '',
-        o3: (pollutants.O3 !== undefined && pollutants.O3[i] !== undefined) ? pollutants.O3[i].nbre_episodes : 0,
-        pm10: (pollutants.PM10 !== undefined && pollutants.PM10[i] !== undefined) ? pollutants.PM10[i].nbre_episodes : 0
+        year: Object.keys(obj)[0] as any,
+        o3: (Object.values(obj)[0] as any).O3[this.departmentCode],
+        pm10: (Object.values(obj)[0] as any).PM10[this.departmentCode]
       });
     }
 
@@ -172,11 +171,11 @@ export default defineComponent({
     // https://www.amcharts.com/docs/v5/concepts/exporting/
     let dataExport = [];
 
-    for (let i = (new Date().getFullYear() - 4); i < new Date().getFullYear(); i++) {
+    for (let obj of this.apiArr) {
       dataExport.push({
-        annee: i + '',
-        nb_episodes_o3: (pollutants.O3 !== undefined && pollutants.O3[i] !== undefined) ? pollutants.O3[i].nbre_episodes : 0,
-        nb_episodes_pm10: (pollutants.PM10 !== undefined && pollutants.PM10[i] !== undefined) ? pollutants.PM10[i].nbre_episodes : 0,
+        annee: Object.keys(obj)[0] as any,
+        nb_episodes_o3: (Object.values(obj)[0] as any).O3[this.departmentCode],
+        nb_episodes_pm10: (Object.values(obj)[0] as any).PM10[this.departmentCode],
         unite: 'Nombre de jours',
         departement: this.departmentCode
       });

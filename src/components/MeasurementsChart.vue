@@ -20,6 +20,8 @@ interface myData {
   stationInfo: any;
   pollutantInfo: any;
   noMeasurementsMessage: boolean;
+  startDate: string;
+  endDate: string;
 }
 
 export default defineComponent({
@@ -28,7 +30,9 @@ export default defineComponent({
     api: Object,
     station: String,
     pollutant: Object,
-    access: String
+    access: String,
+    start: String,
+    end: String
   },
   data(): myData {
     return {
@@ -38,7 +42,9 @@ export default defineComponent({
       accessType: this.access,
       stationInfo: null,
       pollutantInfo: null,
-      noMeasurementsMessage: false
+      noMeasurementsMessage: false,
+      startDate: this.start,
+      endDate: this.end
     };
   },
   mounted(): void {
@@ -321,7 +327,7 @@ export default defineComponent({
 
       am5plugins_exporting.Exporting.new(root, {
         menu: am5plugins_exporting.ExportingMenu.new(root, {}),
-        filePrefix: `${this.stationInfo.station_id}_${this.pollutantInfo.nom}`,
+        filePrefix: `mesures-automatiques_${this.stationInfo.station_id}_${this.pollutantInfo.nom}_${format(new Date(this.startDate), 'dd-MM-yyyy')}_${format(new Date(this.endDate), 'dd-MM-yyyy')}`,
         dataSource: dataExport,
         jpgOptions: {
           disabled: true
@@ -495,7 +501,7 @@ export default defineComponent({
 
       am5plugins_exporting.Exporting.new(root, {
         menu: am5plugins_exporting.ExportingMenu.new(root, {}),
-        filePrefix: `${this.stationInfo.station_id}_${this.pollutantInfo.nom}`,
+        filePrefix: `mesures-differees_${this.stationInfo.station_id}_${this.pollutantInfo.nom}_${format(new Date(this.startDate), 'dd-MM-yyyy')}_${format(new Date(this.endDate), 'dd-MM-yyyy')}`,
         dataSource: dataExport,
         jpgOptions: {
           disabled: true

@@ -167,7 +167,7 @@ export default defineComponent({
       this.cities = [];
       this.userInput = '';
 
-      axios.get(`https://preprod-api.atmosud.org/siam/v1/communes/${this.selectedCity.code}`)
+      axios.get(`https://api.atmosud.org/siam/v1/communes/${this.selectedCity.code}`)
         .then(response => {
           let mainIndex = response.data.data.legendes.indice_pollen.find(i => i.indice === response.data.data.pollens.indice_pollen);
 

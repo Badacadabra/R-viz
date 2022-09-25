@@ -88,7 +88,7 @@
               <ion-card-subtitle>En résumé, en {{ selectedYear }}...</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
-              Il y a eu <strong>{{ nbEpisodes }} épisode{{ nbEpisodes > 1 ? 's' : '' }}</strong> de pollution dans la Région Sud Provence-Alpes-Côte d'Azur, tous polluants confondus.
+              Il y a eu <strong>{{ nbEpisodes }} épisode{{ nbEpisodes > 1 ? 's' : '' }}</strong> de pollution observé{{ nbEpisodes > 1 ? 's' : '' }} dans la Région Sud Provence-Alpes-Côte d'Azur, tous polluants confondus.
             </ion-card-content>
           </ion-card>
           <ion-text>
@@ -128,15 +128,15 @@
         <ion-accordion v-for="episodePart in episodesParts" :key="episodePart.id">
           <ion-item slot="header">
             <ion-label class="ion-text-wrap">
-              <p>Du {{ formatDate(episodePart['date_debut'], 'long') }} au {{ formatDate(episodePart['date_fin'], 'long') }}</p>
-              <h3>{{ episodePart.titre }}</h3>
+              <h3><strong>{{ episodePart.polluant }}</strong> le {{ formatDate(episodePart['date_fin'], 'long') }}</h3>
+              <p>{{ episodePart.commentaire }}</p>
             </ion-label>
           </ion-item>
           <ion-list class="zone-names" slot="content" lines="none">
-            <ion-item v-for="(zone, i) in episodePart.dispositif_prefectoral.zones_en_procedure" :key="i">
+            <ion-item v-for="(zone, i) in episodePart.zones.sort((a, b) => a.nom.localeCompare(b.nom))" :key="i">
               <ion-icon :icon="compassOutline" slot="start"></ion-icon>
               <ion-label>
-                <p>{{ zone.nom }}</p>
+                <p><strong>{{ zone.nom }}</strong><br>{{ zone.niveau }}</p>
               </ion-label>
             </ion-item>
           </ion-list>
@@ -268,7 +268,7 @@ export default defineComponent({
     },
     changeYear(e: CustomEvent): void {
       this.selectedYear = e ? (e.target as any).value : this.selectedYear;
-      this.nbEpisodes = this.episodesStatisticsTotal.find(res => res.annee === this.selectedYear).nbre_episodes;
+      this.nbEpisodes = this.episodesStatisticsTotal[this.selectedYear];
     },
     changeDepartment(): void {
       this.key++;
@@ -279,7 +279,7 @@ export default defineComponent({
       }
 
       if (length === 'long') {
-        return format(new Date(date), 'dd/MM/yyyy (HH:mm)');
+        return format(new Date(date), 'dd/MM/yyyy');
       }
     },
     loadData(e: CustomEvent): void {
@@ -309,17 +309,17 @@ export default defineComponent({
     }
   },
   mounted() {
-    const reqAlerts = axios.get('https://preprod-api.atmosud.org/siam/v1/alertes');
-    const reqEpisodes = axios.get('https://preprod-api.atmosud.org/siam/v1/episodes');
-    const reqStatsDep = axios.get(`https://api.atmosud.org/episodes/statistiques?agrege=annee&format=json&annee_min=${new Date().getFullYear() - 4}`);
-    const reqStatsTotal = axios.get('https://api.atmosud.org/episodes/statistiques/total?format=json');
+    const reqAlerts = axios.get('https://api.atmosud.org/siam/v1/alertes');
+    const reqEpisodes = axios.get('https://api.atmosud.org/siam/v1/episodes');
+    const reqStatsTotal = axios.get('https://api.atmosud.org/episodes/obs/stats/an?format=json');
+    const reqObsList = axios.get('https://api.atmosud.org/episodes/obs/liste');
 
-    axios.all([reqAlerts, reqEpisodes, reqStatsDep, reqStatsTotal])
+    axios.all([reqAlerts, reqEpisodes, reqStatsTotal, reqObsList])
       .then(axios.spread((...responses) => {
         const resAlerts = responses[0];
         const resEpisodes = responses[1];
-        const resStatsDep = responses[2];
-        const resStatsTotal = responses[3];
+        const resStatsTotal = responses[2];
+        const resObsList = responses[3];
 
         // Handle current episodes
         if (resAlerts.data.data.alertes.length > 0) {
@@ -344,9 +344,79 @@ export default defineComponent({
         }
 
         // Handle episodes statistics
-        this.episodesStatisticsForDepartments = resStatsDep.data;
         this.episodesStatisticsTotal = resStatsTotal.data;
         this.changeYear();
+
+        let episodesArr = [];
+
+        for (let year = (new Date().getFullYear() - 4); year <= new Date().getFullYear(); year++) {
+          let nbO3Episodes04 = 0,
+              nbO3Episodes05 = 0,
+              nbO3Episodes06 = 0,
+              nbO3Episodes13 = 0,
+              nbO3Episodes83 = 0,
+              nbO3Episodes84 = 0;
+
+          let nbPMEpisodes04 = 0,
+              nbPMEpisodes05 = 0,
+              nbPMEpisodes06 = 0,
+              nbPMEpisodes13 = 0,
+              nbPMEpisodes83 = 0,
+              nbPMEpisodes84 = 0;
+
+          let tmpObsList = resObsList.data.filter(episode => year === new Date(episode.date).getFullYear());
+
+          for (let episode of tmpObsList) {
+            if (episode.zone === '04' && episode.polluant === 'O3') {
+              nbO3Episodes04++;
+            } else if (episode.zone === '04' && episode.polluant === 'PM10') {
+              nbPMEpisodes04++;
+            } else if (episode.zone === '05' && episode.polluant === 'O3') {
+              nbO3Episodes05++;
+            } else if (episode.zone === '05' && episode.polluant === 'PM10') {
+              nbPMEpisodes05++;
+            } else if (episode.zone === '06' && episode.polluant === 'O3') {
+              nbO3Episodes06++;
+            } else if (episode.zone === '06' && episode.polluant === 'PM10') {
+              nbPMEpisodes06++;
+            } else if (episode.zone === '13' && episode.polluant === 'O3') {
+              nbO3Episodes13++;
+            } else if (episode.zone === '13' && episode.polluant === 'PM10') {
+              nbPMEpisodes13++;
+            } else if (episode.zone === '83' && episode.polluant === 'O3') {
+              nbO3Episodes83++;
+            } else if (episode.zone === '83' && episode.polluant === 'PM10') {
+              nbPMEpisodes83++;
+            } else if (episode.zone === '84' && episode.polluant === 'O3') {
+              nbO3Episodes84++;
+            } else if (episode.zone === '84' && episode.polluant === 'PM10') {
+              nbPMEpisodes84++;
+            }
+          }
+
+          episodesArr.push({
+            [year]: {
+              'O3': {
+                '04': nbO3Episodes04,
+                '05': nbO3Episodes05,
+                '06': nbO3Episodes06,
+                '13': nbO3Episodes13,
+                '83': nbO3Episodes83,
+                '84': nbO3Episodes84
+              },
+              'PM10': {
+                '04': nbPMEpisodes04,
+                '05': nbPMEpisodes05,
+                '06': nbPMEpisodes06,
+                '13': nbPMEpisodes13,
+                '83': nbPMEpisodes83,
+                '84': nbPMEpisodes84
+              }
+            }
+          });
+        }
+
+        this.episodesStatisticsForDepartments = episodesArr;
       }))
       .catch(() => {
         this.isAlertDisplayed = true;

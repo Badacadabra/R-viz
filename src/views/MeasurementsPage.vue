@@ -171,14 +171,14 @@
       <div v-if="measurementsByStation">
         <ion-card v-for="(selectedPollutant, i) in selectedPollutants" :key="i">
           <ion-card-content>
-            <MeasurementsChart :api="measurementsByStation" :station="selectedStation" :pollutant="selectedPollutant" :access="access" :key="key" />
+            <MeasurementsChart :api="measurementsByStation" :station="selectedStation" :pollutant="selectedPollutant" :access="access" :start="startDate" :end="endDate" :key="key" />
           </ion-card-content>
         </ion-card>
       </div>
       <div v-if="measurementsByPollutant">
         <ion-card v-for="(selectedStation, i) in selectedStations" :key="i">
           <ion-card-content>
-            <MeasurementsChart :api="measurementsByPollutant" :pollutant="selectedPollutant" :station="selectedStation" :access="access" :key="key" />
+            <MeasurementsChart :api="measurementsByPollutant" :pollutant="selectedPollutant" :station="selectedStation" :access="access" :start="startDate" :end="endDate" :key="key" />
           </ion-card-content>
         </ion-card>
       </div>
@@ -389,9 +389,9 @@ export default defineComponent({
           selectedPollutantsIds.push(selectedPollutant.polluant_id);
         }
 
-        url = `https://preprod-api.atmosud.org/siam/v1/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&station_id=${this.selectedStation}&polluant_id=${selectedPollutantsIds.toString()}`;
+        url = `https://api.atmosud.org/siam/v1/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&station_id=${this.selectedStation}&polluant_id=${selectedPollutantsIds.toString()}`;
       } else {
-        url = `https://preprod-api.atmosud.org/siam/v1/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&polluant_id=${this.selectedPollutant.polluant_id}&station_id=${this.selectedStations.toString()}`;
+        url = `https://api.atmosud.org/siam/v1/stations/mesures?date_debut=${this.startDate}&date_fin=${this.endDate}&polluant_id=${this.selectedPollutant.polluant_id}&station_id=${this.selectedStations.toString()}`;
       }
 
       axios.get(url)
@@ -426,8 +426,8 @@ export default defineComponent({
     this.endDate = this.today();
   },
   mounted() {
-    const reqStations = axios.get('https://preprod-api.atmosud.org/siam/v1/stations');
-    const reqPollutants = axios.get('https://preprod-api.atmosud.org/siam/v1/polluants');
+    const reqStations = axios.get('https://api.atmosud.org/siam/v1/stations');
+    const reqPollutants = axios.get('https://api.atmosud.org/siam/v1/polluants');
 
     axios.all([reqStations, reqPollutants])
       .then(axios.spread((...responses) => {

@@ -16,6 +16,7 @@ interface myData {
   selectedThreshold: string;
   selectedScope: string;
   selectedCity: any;
+  selectedEpci: string;
   selectedDepartment: string;
 }
 
@@ -27,6 +28,7 @@ export default defineComponent({
     threshold: String,
     scope: String,
     city: Object,
+    epci: String,
     department: String
   },
   data(): myData {
@@ -36,6 +38,7 @@ export default defineComponent({
       selectedThreshold: this.threshold,
       selectedScope: this.scope,
       selectedCity: this.city,
+      selectedEpci: this.epci,
       selectedDepartment: this.department
     };
   },
@@ -163,9 +166,19 @@ export default defineComponent({
     // Set exporting
     // https://www.amcharts.com/docs/v5/concepts/exporting/
     let dataExport = [],
-        territory = this.selectedScope === 'city' ? this.selectedCity.code : this.selectedDepartment;
+        territory = '';
 
-    console.log(this.selectedScope);
+    switch (this.selectedScope) {
+      case 'city':
+        territory = this.selectedCity.code;
+        break;
+      case 'epci':
+        territory = this.selectedEpci;
+        break;
+      case 'department':
+        territory = this.selectedDepartment;
+        break;
+    }
 
     for (let year in values) {
       if (parseInt(year) > (thisYear - 7) && values[year][this.selectedPollutant]) {

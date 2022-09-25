@@ -1,5 +1,5 @@
 <template>
-  <div id="atmo-map"></div>
+  <div id="atmo-map" ref="atmoMap"></div>
 </template>
 
 <script lang="ts">
@@ -95,27 +95,96 @@ export default defineComponent({
       }).addTo(this.map);
 
       // Export
-      this.screenshoter = new SimpleMapScreenshoter().addTo(this.map);
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter = new SimpleMapScreenshoter({
+          hideElementsWithSelectors: ['.leaflet-control-zoom', '.leaflet-control-simpleMapScreenshoter']
+        }).addTo(this.map);
+      }
 
+      // Map controls
+      const ctrl = L.control as any,
+            legend = ctrl({ position: 'topleft' }),
+            watermark = ctrl({ position: 'bottomright' });
+
+      axios.get('https://api.atmosud.org/siam/v1/accueil')
+        .then(response => {
+          legend.onAdd = () => {
+            let div = L.DomUtil.create('div', 'legend');
+
+            response.data.data.legendes.indice_atmo.forEach(i => {
+              div.innerHTML += '<div>';
+              div.innerHTML += `<div class="legend-color" style="background-color:${i.couleur};"></div>`;
+              div.innerHTML += `<span>${i.qualificatif}</span>`;
+              div.innerHTML += '</div>';
+            });
+
+            return div;
+          };
+
+          legend.addTo(this.map);
+        });
+
+      watermark.onAdd = () => {
+        let div = L.DomUtil.create('div', 'watermark');
+
+        div.innerHTML += '<img src="/app/assets/img/logo-atmosud.png" alt="AtmoSud" style="display:none;">';
+
+        return div;
+      };
+
+      watermark.addTo(this.map);
+
+      const watermarkImg = this.$refs.atmoMap.querySelector('.watermark img');
+
+      this.map.on('simpleMapScreenshoter.click', () => {
+        this.map.dragging.disable();
+        watermarkImg.style.display = 'block';
+      });
+
+      this.map.on('simpleMapScreenshoter.done', () => {
+        this.map.dragging.enable();
+        watermarkImg.style.display = 'none';
+      });
+
+      // Data
       this.addChoropleth();
     },
     addChoropleth(): void {
       const reqPolygons = axios.get('https://geo.api.gouv.fr/communes?codeRegion=93&format=geojson&geometry=contour');
-      const reqColors = axios.get('https://preprod-api.atmosud.org/siam/v1/accueil');
+      const reqColors = axios.get('https://api.atmosud.org/siam/v1/accueil');
+
+      /* function getColor(atmo) {
+        return atmo === 0 ? '#dddddd' : // Indisponible
+          atmo === 1 ? '#50F0E6' : // Bon
+          atmo === 2 ? '#50CCAA' : // Moyen
+          atmo === 3 ? '#F0E641' : // Dégradé
+          atmo === 4 ? '#FF5050' : // Mauvais
+          atmo === 5 ? '#960032' : // Très mauvais
+          atmo === 6 ? '#872181' : // Extrêmement mauvais
+          atmo === 7 ? '#888888' : ''; // Événement
+      } */
 
       axios.all([reqPolygons, reqColors]).then(axios.spread((...responses) => {
         const resPolygons = responses[0];
         const resColors = responses[1];
 
+        /* let newGeoJson = resPolygons.data;
+
+        for (let feature of newGeoJson.features) {
+          feature.properties.iqa = Math.trunc(resColors.data.data.cartes.communes[feature.properties.code][this.currentDate].indice_atmo);
+        } */
+
         this.currentLayer = L.geoJSON(resPolygons.data, {
           style: () => {
             return {
+              /* fillColor: getColor(feature.properties.iqa),
+              fillOpacity: 1, */
               color: 'white',
               weight: 1
             }
           },
           onEachFeature: (feature, layer: any) => {
-            let color = resColors.data.data.legendes.indice_atmo.find(i => i.indice === resColors.data.data.cartes.communes[feature.properties.code][this.currentDate].indice_atmo).couleur;
+            let color = resColors.data.data.legendes.indice_atmo.find(i => i.indice === Math.trunc(resColors.data.data.cartes.communes[feature.properties.code][this.currentDate].indice_atmo)).couleur;
 
             layer.setStyle({
               'fillColor': color,
@@ -129,10 +198,13 @@ export default defineComponent({
         }).addTo(this.map);
 
         this.$emit('mapReady');
+
       }));
 
       // Export
-      this.screenshoter.options.screenName = `indice-atmo_${format(new Date(this.currentDate), 'dd-MM-yyyy')}`;
+      if (getPlatforms().includes('desktop')) {
+        this.screenshoter.options.screenName = `indice-atmo_${format(new Date(this.currentDate), 'dd-MM-yyyy')}`;
+      }
     }
   },
   mounted() {
@@ -145,5 +217,18 @@ export default defineComponent({
 #atmo-map {
   width: 100%;
   height: 90%;
+}
+
+#atmo-map .legend {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 5px;
+  padding: 5px;
+}
+
+#atmo-map .legend-color {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  margin-right: 10px;
 }
 </style>
