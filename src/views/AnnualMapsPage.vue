@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <HeadingBar title="Cartes annuelles" :back="true" />
-    <ion-content color="light" scroll-y="false" :fullscreen="true">
+    <ion-content color="light" :fullscreen="true">
       <ion-range v-model="selectedYear" :min="2013" :max="new Date().getFullYear() - 1" step="1" ticks="true" snaps="true" :pin="true" color="secondary">
         <ion-icon :icon="calendarOutline" size="small" slot="start"></ion-icon>
         <ion-icon :icon="calendarOutline" slot="end"></ion-icon>

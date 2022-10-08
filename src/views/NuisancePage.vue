@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <HeadingBar title="Nuisances" :back="true" />
-    <ion-content color="light" :scroll-y="false" :fullscreen="true">
+    <ion-content color="light" :fullscreen="true">
       <img id="signalair" src="/app/assets/img/logo-signalair.png">
       <div id="buttons">
         <ion-button id="open-start-modal" color="secondary" fill="outline">

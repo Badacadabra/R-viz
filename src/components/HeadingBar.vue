@@ -30,7 +30,7 @@
           <ion-card-title>C'est quoi, R-viz ?</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          R-viz est une application de visualisation de données relatives à la qualité de l'air en Région Sud Provence-Alpes-Côte d'Azur. Développée par <strong>AtmoSud</strong>, cette application vous permet de visualiser, avec un ensemble de cartes et de graphes, des données utiles sur tout le territoire : l'indice ATMO, les prévisions détaillées, l'indice pollinique, les mesures aux stations, les épisodes de pollution, l'exposition des populations, les émissions de polluants, les cartes annuelles, les microcapteurs et les signalements de nuisances.
+          <strong>R-viz</strong> est une application de visualisation de données relatives à la qualité de l'air en Région Sud Provence-Alpes-Côte d'Azur. Développée par <strong>AtmoSud</strong>, cette application vous permet de visualiser, avec un ensemble de cartes et de graphes, des données utiles sur tout le territoire : l'indice ATMO, les prévisions détaillées, l'indice pollinique, les mesures aux stations, les épisodes de pollution, l'exposition des populations, les émissions de polluants, les cartes annuelles, les microcapteurs et les signalements de nuisances.
         </ion-card-content>
       </ion-card>
       <ion-card>
@@ -38,7 +38,15 @@
           <ion-card-title>Qui est AtmoSud ?</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          AtmoSud est l'association agréée de surveillance de la qualité de l'air (AASQA) en Région Sud Provence-Alpes-Côte d'Azur. Nos missions : surveiller et informer.
+          <strong>AtmoSud</strong> est l'association agréée de surveillance de la qualité de l'air (AASQA) en Région Sud Provence-Alpes-Côte d'Azur. Nos missions : surveiller et informer.
+        </ion-card-content>
+      </ion-card>
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Mentions techniques</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <strong>R-viz</strong> a été développé avec le framework <a href="https://ionicframework.com/vue" target="_blank">Ionic Vue</a>, en utilisant <a href="https://leafletjs.com/" target="_blank">Leaflet</a> et <a href="https://www.amcharts.com/" target="_blank">amCharts</a> pour la dataviz. Les fonds de carte proviennent tous du <a href="https://www.arcgis.com/home/group.html?focus=maps&id=702026e41f6641fb85da88efe79dc166&view=list#content" target="_blank">catalogue d'Esri</a>.
         </ion-card-content>
       </ion-card>
     </ion-content>

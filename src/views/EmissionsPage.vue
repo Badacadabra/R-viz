@@ -8,7 +8,7 @@
       @didDismiss="hideAlert()"
     ></ion-alert>
     <HeadingBar title="Émissions polluantes" :back="true" />
-    <ion-content color="light" :fullscreen="true" scroll-y="false">
+    <ion-content color="light" :fullscreen="true">
       <ion-loading :is-open="!isDataLoaded" message="Veuillez patienter..."></ion-loading>
       <ion-item>
         <ion-label>Polluant</ion-label>

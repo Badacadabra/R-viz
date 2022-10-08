@@ -8,7 +8,7 @@
       @didDismiss="hideAlert()"
     ></ion-alert>
     <HeadingBar title="Prévisions détaillées" :back="true" />
-    <ion-content color="light" scroll-y="false" :fullscreen="true">
+    <ion-content color="light" :fullscreen="true">
       <ion-progress-bar color="tertiary" type="indeterminate" v-if="!isDataLoaded"></ion-progress-bar>
       <ion-searchbar placeholder="Tapez une adresse..." autocomplete="on" v-model="userInput" @ionChange="getSuggestions()"></ion-searchbar>
       <ion-list id="suggestions" v-if="userInput && addresses.length > 0">

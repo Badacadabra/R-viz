@@ -62,6 +62,7 @@ export default defineComponent({
         zoomControl,
         minZoom: zoomLevel,
         maxZoom: 17,
+        scrollWheelZoom: false,
         attributionControl: false
       }).setView(this.center, zoomLevel);
 
@@ -124,7 +125,7 @@ export default defineComponent({
         let div = L.DomUtil.create('div', 'legend');
 
         div.innerHTML += '<div></div>';
-        div.innerHTML += `<img src="https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=15&LAYER=azurjour:paca-${this.selectedPollutantId}-${this.currentDate}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true" alt="Légende">`;
+        div.innerHTML += `<img src="https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=12&LAYER=azurjour:paca-${this.selectedPollutantId}-${this.currentDate}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true" alt="Légende">`;
 
         return div;
       };
@@ -164,7 +165,7 @@ export default defineComponent({
             legendUnit.textContent = 'µg/m³';
           }
 
-          legendImg.src = `https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=15&LAYER=azurjour:paca-${this.selectedPollutantId}-${this.currentDate}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true`;
+          legendImg.src = `https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=12&LAYER=azurjour:paca-${this.selectedPollutantId}-${this.currentDate}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true`;
         });
       }
 
@@ -210,8 +211,12 @@ export default defineComponent({
 
 <style>
 #forecasts-map {
- width: 100%;
- height: 85%;
+  width: 90%;
+  height: 550px;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-radius: 15px;
 }
 
 #forecasts-map .menu, #forecasts-map .pollutantSelector {
@@ -251,6 +256,16 @@ export default defineComponent({
 @media screen and (max-width: 992px) {
   .legend {
     margin-top: 50px !important;
+    margin-left: 5px !important;
+  }
+}
+
+@media screen and (min-width: 993px) {
+  #forecasts-map {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
   }
 }
 </style>

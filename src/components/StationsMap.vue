@@ -64,6 +64,7 @@ export default defineComponent({
         zoomControl,
         minZoom: 7,
         maxZoom: 17,
+        scrollWheelZoom: false,
         attributionControl: false,
         tap: false
       }).setView(this.center, 7);
@@ -212,8 +213,12 @@ export default defineComponent({
 
 <style>
 #stations-map {
- width: 100%;
- height: 350px;
+  width: 90%;
+  height: 350px;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-radius: 15px;
 }
 
 #stations-map .leaflet-popup-content-wrapper, #stations-map .leaflet-popup-tip {
@@ -229,5 +234,13 @@ export default defineComponent({
   background-color: white;
   border-radius: 5px;
   padding: 5px;
+}
+
+@media screen and (min-width: 993px) {
+  #stations-map {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
 }
 </style>

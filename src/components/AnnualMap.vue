@@ -64,6 +64,7 @@ export default defineComponent({
         zoomControl,
         minZoom: zoomLevel,
         maxZoom: 17,
+        scrollWheelZoom: false,
         attributionControl: false
       }).setView(this.center, zoomLevel);
 
@@ -126,7 +127,7 @@ export default defineComponent({
         let div = L.DomUtil.create('div', 'mainLegend');
 
         div.innerHTML += '<div></div>';
-        div.innerHTML += `<img src="https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=15&LAYER=mod_sudpaca_${this.selectedYear}:mod_sudpaca_${this.selectedYear}_${this.selectedPollutantId}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true" alt="Légende">`;
+        div.innerHTML += `<img src="https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=12&LAYER=mod_sudpaca_${this.selectedYear}:mod_sudpaca_${this.selectedYear}_${this.selectedPollutantId}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true" alt="Légende">`;
 
         return div;
       };
@@ -226,8 +227,12 @@ export default defineComponent({
 
 <style>
 #annual-map {
- width: 100%;
- height: 90%;
+  width: 90%;
+  height: 550px;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-radius: 15px;
 }
 
 #annual-map .menu, #annual-map .pollutantSelector {
@@ -262,6 +267,10 @@ export default defineComponent({
   margin-left: 0;
 }
 
+.mainLegend {
+  margin-left: 5px !important;
+}
+
 .mainLegend div {
   background: rgba(255, 255, 255, 0.9);
   text-align: center;
@@ -270,5 +279,14 @@ export default defineComponent({
 .mainLegend img {
   background-color: rgba(255, 255, 255, 0.9);
   padding: 5px;
+}
+
+@media screen and (min-width: 993px) {
+  #annual-map {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
 }
 </style>

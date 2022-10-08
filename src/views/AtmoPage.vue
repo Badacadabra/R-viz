@@ -8,7 +8,7 @@
       @didDismiss="hideAlert()"
     ></ion-alert>
     <HeadingBar title="Indice ATMO" :back="true" />
-    <ion-content color="light" scroll-y="false" :fullscreen="true">
+    <ion-content color="light" :fullscreen="true">
       <ion-progress-bar color="tertiary" type="indeterminate" v-if="!isDataLoaded"></ion-progress-bar>
       <ion-loading :is-open="!isMapLoaded && !isModalOpened" message="Veuillez patienter..."></ion-loading>
       <ion-searchbar placeholder="Entrez une commune..." autocomplete="on" v-model="userInput" @ionChange="getSuggestions()"></ion-searchbar>

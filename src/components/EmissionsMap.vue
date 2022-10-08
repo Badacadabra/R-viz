@@ -68,6 +68,7 @@ export default defineComponent({
         zoomControl,
         minZoom: zoomLevel,
         maxZoom: 17,
+        scrollWheelZoom: false,
         attributionControl: false
       }).setView(this.center, zoomLevel);
 
@@ -276,8 +277,12 @@ export default defineComponent({
 
 <style>
 #emissions-map {
- width: 100%;
- height: 100%;
+  width: 90%;
+  height: 550px;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-radius: 15px;
 }
 
 #emissions-map .legend {
@@ -298,5 +303,14 @@ export default defineComponent({
   float: left;
   margin-right: 8px;
   opacity: 0.7;
+}
+
+@media screen and (min-width: 993px) {
+  #emissions-map {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
 }
 </style>

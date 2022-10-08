@@ -61,6 +61,7 @@ export default defineComponent({
         zoomControl,
         minZoom: zoomLevel,
         maxZoom: 17,
+        scrollWheelZoom: false,
         attributionControl: false
       }).setView(this.center, zoomLevel);
 
@@ -112,10 +113,7 @@ export default defineComponent({
             let div = L.DomUtil.create('div', 'legend');
 
             response.data.data.legendes.indice_atmo.forEach(i => {
-              div.innerHTML += '<div>';
-              div.innerHTML += `<div class="legend-color" style="background-color:${i.couleur};"></div>`;
-              div.innerHTML += `<span>${i.qualificatif}</span>`;
-              div.innerHTML += '</div>';
+              div.innerHTML += `<div><div class="legend-color" style="background-color:${i.couleur};"></div><span>${i.qualificatif}</span></div>`;
             });
 
             return div;
@@ -215,8 +213,12 @@ export default defineComponent({
 
 <style>
 #atmo-map {
-  width: 100%;
-  height: 90%;
+  width: 90%;
+  height: 550px;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-radius: 15px;
 }
 
 #atmo-map .legend {
@@ -225,10 +227,23 @@ export default defineComponent({
   padding: 5px;
 }
 
+#atmo-map .legend > div {
+  height: 16px;
+}
+
 #atmo-map .legend-color {
   width: 10px;
   height: 10px;
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 5px;
+}
+
+@media screen and (min-width: 993px) {
+  #atmo-map {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
 }
 </style>

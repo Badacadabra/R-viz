@@ -263,6 +263,7 @@ export default defineComponent({
         zoomControl,
         minZoom: zoomLevel,
         maxZoom: 17,
+        scrollWheelZoom: false,
         attributionControl: false,
         tap: false
       }).setView(this.center, zoomLevel);
@@ -545,8 +546,12 @@ export default defineComponent({
 
 <style>
 #nuisance-map {
- width: 100%;
- height: 75%;
+  width: 90%;
+  height: 450px;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-radius: 15px;
 }
 
 #nuisance-map .leaflet-popup-content-wrapper, #nuisance-map .leaflet-popup-tip {
@@ -586,5 +591,14 @@ export default defineComponent({
 
 ion-list-header {
   padding-left: 0;
+}
+
+@media screen and (min-width: 993px) {
+  #nuisance-map {
+    width: 100%;
+    height: 75%;
+    margin: 0;
+    border-radius: 0;
+  }
 }
 </style>

@@ -38,6 +38,7 @@ export default defineComponent({
         zoomControl: false,
         minZoom: 7,
         maxZoom: 17,
+        scrollWheelZoom: false,
         attributionControl: false
       }).setView(this.center, 7);
 
@@ -87,7 +88,19 @@ export default defineComponent({
 
 <style scoped>
 #episodes-map {
- width: 100%;
- height: 350px;
+  width: 90%;
+  height: 350px;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-radius: 15px;
+}
+
+@media screen and (min-width: 993px) {
+  #episodes-map {
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
 }
 </style>
