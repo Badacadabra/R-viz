@@ -43,23 +43,23 @@
               </ion-item>
             </ion-col>
             <ion-col>
-              <ion-item button router-link="/exposition">
-                <ion-icon :icon="bodyOutline" slot="start" size="large"></ion-icon>
-                <ion-label>Exposition des populations</ion-label>
+              <ion-item button router-link="/cartes">
+                <ion-icon :icon="mapOutline" slot="start" size="large"></ion-icon>
+                <ion-label>Cartes annuelles</ion-label>
               </ion-item>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col>
-              <ion-item button router-link="/emissions">
-                <ion-icon :icon="cloudyOutline" slot="start" size="large"></ion-icon>
-                <ion-label>Émissions polluantes</ion-label>
+              <ion-item button router-link="/exposition">
+                <ion-icon :icon="bodyOutline" slot="start" size="large"></ion-icon>
+                <ion-label>Exposition des populations</ion-label>
               </ion-item>
             </ion-col>
             <ion-col>
-              <ion-item button router-link="/cartes">
-                <ion-icon :icon="mapOutline" slot="start" size="large"></ion-icon>
-                <ion-label>Cartes annuelles</ion-label>
+              <ion-item button router-link="/emissions">
+                <ion-icon :icon="cloudyOutline" slot="start" size="large"></ion-icon>
+                <ion-label>Émissions polluantes</ion-label>
               </ion-item>
             </ion-col>
           </ion-row>
@@ -91,17 +91,6 @@
             </ion-card-header>
             <ion-card-content>
               APIs d'AtmoSud à destination des développeurs
-            </ion-card-content>
-          </ion-card>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-card class="services" @click="showWebPage('https://opendata.atmosud.org')">
-            <ion-img src="/app/assets/img/open-data.png"></ion-img>
-            <ion-card-header>
-              <ion-card-title>Open Data</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              Données d'AtmoSud dans des formats normalisés
             </ion-card-content>
           </ion-card>
         </swiper-slide>
