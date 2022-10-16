@@ -29,4 +29,18 @@ ion-icon {
   .main-modal::part(content) {
     height: 750px;
   }
+
+  .alert-wrapper.sc-ion-alert-md {
+    width: 500px;
+    max-width: 500px;
+    max-height: 750px;
+  }
+
+  .alert-radio-group.sc-ion-alert-md, .alert-checkbox-group.sc-ion-alert-md {
+    max-height: 750px;
+  }
+
+  .radio-wrap.alert-tappable.sc-ion-alert-md, .checkbox-wrap.alert-tappable.sc-ion-alert-md {
+    height: 48px !important;
+  }
 }
