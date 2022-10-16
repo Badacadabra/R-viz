@@ -206,7 +206,7 @@ export default defineComponent({
             arr.push(obj);
           }
 
-          this.recommendations = response.data.data.pollens.recommandations;
+          this.recommendations = response.data.data.pollens.recommandations || [];
           this.taxons = arr;
         })
         .catch(() => {
