@@ -31,7 +31,7 @@ export default defineComponent({
       center: [43.938, 6.022], // Entrevennes
       currentLayer: null,
       selectedYear: this.year,
-      selectedPollutantId: 'isa_an',
+      selectedPollutantId: 'icair365',
       legend: null,
       screenshoter: null
     }
@@ -108,17 +108,41 @@ export default defineComponent({
       // Map controls
       const ctrl = L.control as any,
             menu = ctrl({ position: 'topright' }),
+            o3Submenu = ctrl({ position: 'topright' }),
+            pm10Submenu = ctrl({ position: 'topright' }),
             mainLegend = ctrl({ position: 'topleft' }),
             watermark = ctrl({ position: 'bottomright' });
 
       menu.onAdd = () => {
         let div = L.DomUtil.create('div', 'menu');
 
-        div.innerHTML = `<button id="isa_an" class="active pollutantSelector">ISA</button>
-                         <button id="o3_p932m8hj" class="pollutantSelector">O₃</button>
+        div.innerHTML = `<button id="icair365" class="active pollutantSelector">ICAIR 365</button>
+                         <button id="o3" class="pollutantSelector">O₃</button>
                          <button id="no2_moyan" class="pollutantSelector">NO₂</button>
                          <button id="pm25_moyan" class="pollutantSelector">PM2.5</button>
-                         <button id="pm10_moyan" class="pollutantSelector">PM10</button>`;
+                         <button id="pm10" class="pollutantSelector">PM10</button>`;
+
+        return div;
+      };
+
+      o3Submenu.onAdd = () => {
+        let div = L.DomUtil.create('div', 'o3Submenu');
+
+        div.style.display = 'none';
+
+        div.innerHTML = `<button id="o3_p932m8hj" class="active o3SubSelector">O₃ p932m8hj</button>
+                         <button id="o3_pic" class="o3SubSelector">O₃ pic</button>`;
+
+        return div;
+      };
+
+      pm10Submenu.onAdd = () => {
+        let div = L.DomUtil.create('div', 'pm10Submenu');
+
+        div.style.display = 'none';
+
+        div.innerHTML = `<button id="pm10_moyan" class="active pm10SubSelector">PM10 moyan</button>
+                         <button id="pm10_p90j" class="pm10SubSelector">PM10 p90j</button>`;
 
         return div;
       };
@@ -141,35 +165,80 @@ export default defineComponent({
       };
 
       menu.addTo(this.map);
+      o3Submenu.addTo(this.map);
+      pm10Submenu.addTo(this.map);
       mainLegend.addTo(this.map);
       watermark.addTo(this.map);
 
       // Event listeners
-      const buttons = this.$refs.annualMap.querySelectorAll('.pollutantSelector'),
+      const mainButtons = this.$refs.annualMap.querySelectorAll('.pollutantSelector'),
             mainLegendUnit = this.$refs.annualMap.querySelector('.mainLegend div'),
             mainLegendImg = this.$refs.annualMap.querySelector('.mainLegend img'),
-            watermarkImg = this.$refs.annualMap.querySelector('.watermark img');
+            watermarkImg = this.$refs.annualMap.querySelector('.watermark img'),
+            o3SubmenuDiv = this.$refs.annualMap.querySelector('.o3Submenu'),
+            pm10SubmenuDiv = this.$refs.annualMap.querySelector('.pm10Submenu'),
+            o3SubButtons = this.$refs.annualMap.querySelectorAll('.o3SubSelector'),
+            pm10SubButtons = this.$refs.annualMap.querySelectorAll('.pm10SubSelector');
 
-      for (let button of buttons) {
+      for (let button of mainButtons) {
         button.addEventListener('click', (e) => {
-          for (let btn of buttons) {
+          for (let btn of mainButtons) {
             btn.classList.remove('active');
           }
 
           (e.target as HTMLElement).classList.add('active');
-          this.selectedPollutantId = (e.target as HTMLElement).id;
+
+          if ((e.target as HTMLElement).id === 'o3') {
+            o3SubmenuDiv.style.display = 'block';
+            pm10SubmenuDiv.style.display = 'none';
+            this.selectedPollutantId = o3SubmenuDiv.querySelector('.active').id;
+          } else if ((e.target as HTMLElement).id === 'pm10') {
+            pm10SubmenuDiv.style.display = 'block'; 
+            o3SubmenuDiv.style.display = 'none';
+            this.selectedPollutantId = pm10SubmenuDiv.querySelector('.active').id;
+          } else {
+            o3SubmenuDiv.style.display = 'none';
+            pm10SubmenuDiv.style.display = 'none';
+
+            this.selectedPollutantId = (e.target as HTMLElement).id;
+          }
+
           this.map.removeLayer(this.currentLayer);
           this.addRaster(false);
 
-          if (this.selectedPollutantId === 'isa_an') {
+          if (this.selectedPollutantId === 'icair365') {
             mainLegendUnit.textContent = '';
           } else {
             mainLegendUnit.textContent = 'µg/m³';
           }
 
-          mainLegendImg.src = `https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=15&LAYER=mod_sudpaca_${this.selectedYear}:mod_sudpaca_${this.selectedYear}_${this.selectedPollutantId}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true`;
+          mainLegendImg.src = `https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=12&LAYER=mod_sudpaca_${this.selectedYear}:mod_sudpaca_${this.selectedYear}_${this.selectedPollutantId}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true`;
         });
       }
+
+      const subButtonsEventHandler = pollutantButtons => {
+        for (let button of pollutantButtons) {
+          button.addEventListener('click', (e) => {
+            console.log('Bouton OK');
+
+            for (let btn of pollutantButtons) {
+              btn.classList.remove('active');
+            }
+
+            (e.target as HTMLElement).classList.add('active');
+
+            this.selectedPollutantId = (e.target as HTMLElement).id;
+
+            this.map.removeLayer(this.currentLayer);
+            this.addRaster(false);
+
+            mainLegendImg.src = `https://geoservices.atmosud.org/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=12&LAYER=mod_sudpaca_${this.selectedYear}:mod_sudpaca_${this.selectedYear}_${this.selectedPollutantId}&legend_options=fontColor:0x000000;dx:5;dy:0;mx:0;my:0;&TRANSPARENT=true`;
+          });
+        }
+      }
+
+      subButtonsEventHandler(o3SubButtons);
+      subButtonsEventHandler(pm10SubButtons);
 
       this.map.on('simpleMapScreenshoter.click', () => {
         this.map.dragging.disable();
@@ -235,12 +304,19 @@ export default defineComponent({
   border-radius: 15px;
 }
 
-#annual-map .menu, #annual-map .pollutantSelector {
+#annual-map .menu,
+#annual-map .o3Submenu,
+#annual-map .pm10Submenu,
+#annual-map .pollutantSelector,
+#annual-map .o3SubSelector,
+#annual-map .pm10SubSelector {
   background-color: white;
   border-radius: 20px;
 }
 
-#annual-map .pollutantSelector {
+#annual-map .pollutantSelector,
+#annual-map .o3SubSelector,
+#annual-map .pm10SubSelector {
   padding: 10px;
 }
 
@@ -255,12 +331,6 @@ export default defineComponent({
   margin-top: 10px;
   background-color: var(--ion-color-tertiary);
   border-radius: 0 5px 5px 0;
-}
-
-#annual-map .leaflet-top.leaflet-right {
-  width: 100%;
-  display: flex;
-  justify-content: right;
 }
 
 #annual-map .leaflet-right .leaflet-control {
@@ -287,6 +357,12 @@ export default defineComponent({
     height: 100%;
     margin: 0;
     border-radius: 0;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  #annual-map .mainLegend {
+    margin-top: 50px;
   }
 }
 </style>
